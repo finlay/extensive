@@ -1,0 +1,7 @@
+*.swp
+*.hi
+*.o
+*.aux
+*.log
+*.pdf
+dist/
