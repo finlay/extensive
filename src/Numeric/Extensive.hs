@@ -1,9 +1,6 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE BangPatterns #-}
 
 module Numeric.Extensive where
@@ -97,7 +94,7 @@ instance (Show x, Show y) => Show (Hom x y) where
     show (Hom x y) = show x ++ " \x21A6 " ++ show y
 
 delta :: (Eq x) => x -> x -> R
-delta a b = if a == b then 1 else 0
+delta a b = {-# SCC "delta" #-} if a == b then 1 else 0
 
 -- If we have a vector over a finite set, we can calculate the coefficients
 coefficients :: (FiniteSet x, Eq x) => V x -> [(x, R)]
@@ -107,7 +104,7 @@ coefficients (V v) = map (\e -> (e, v (delta e))) elements
 --    x == y = all (\e -> x e == y e) elements
 
 instance (Eq a, FiniteSet a) => Eq (V a) where
-    x' == y' = sum (map (squared . snd) ( coefficients (subtract x' y'))) <= epsilon
+    x' == y' =  {-# SCC "EQUALS" #-} sum (map (squared . snd) ( coefficients (subtract x' y'))) <= epsilon
               where 
                 squared x'' = x'' * x''
                 subtract (V x'') (V y'') = V $ (\ar -> x'' ar - y'' ar)
