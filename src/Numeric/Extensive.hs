@@ -6,7 +6,6 @@
 module Numeric.Extensive where
 
 import Text.PrettyPrint.Boxes
-import Control.Monad (join)
 import Control.Monad.State
 import Control.Applicative 
 import Text.Printf
@@ -66,7 +65,7 @@ apply :: (Eq a)
 apply = curry (unMaybe . fmap ex . uncurry tensor)
   where
     unMaybe = extend (maybe zero return)
-    ex (Tensor (Hom x y) x') = if x == x' then Just y else Nothing
+    ex (Tensor (Hom x y) x') = {-# SCC "ex" #-} if x == x' then Just y else Nothing
 
 em :: (Eq a) => Hom a b -> V a -> V b
 em (Hom x y) (V vx) = 
@@ -76,7 +75,7 @@ em (Hom x y) (V vx) =
 -- memoised multiplication
 mmul :: (Eq a, FiniteSet a, Eq c, FiniteSet c) 
      => (V b -> V c) -> (V a -> V b) -> (V a -> V c)
-mmul a b = apply . hom $ (a . b)
+mmul a b =  {-# SCC "mmul" #-} apply . hom $ (a . b)
 
 -- Finite sets can be listed, which is elements
 class FiniteSet x where elements :: [ x ]
@@ -104,10 +103,10 @@ coefficients (V v) = map (\e -> (e, v (delta e))) elements
 --    x == y = all (\e -> x e == y e) elements
 
 instance (Eq a, FiniteSet a) => Eq (V a) where
-    x' == y' =  {-# SCC "EQUALS" #-} sum (map (squared . snd) ( coefficients (subtract x' y'))) <= epsilon
+    x' == y' =  {-# SCC "EQUALS" #-} sum (map (squared . snd) ( coefficients (subtract' x' y'))) <= epsilon
               where 
                 squared x'' = x'' * x''
-                subtract (V x'') (V y'') = V $ (\ar -> x'' ar - y'' ar)
+                subtract' (V x'') (V y'') = V $ (\ar -> x'' ar - y'' ar)
 
 instance (Eq a, FiniteSet a, Ord a) => Ord (V a) where
     compare x y = compare (coefficients x) (coefficients y)
@@ -225,9 +224,9 @@ diagonaliseSym maxcount ma =
             if c < maxcount && offNorm m > 1e-8 
                 then nextDiagStep >> diagonalise
                 else do 
-                    m  <- gets result
+                    m'  <- gets result
                     ts <- gets transforms
-                    return (m, ts)
+                    return (m', ts)
     in  runState diagonalise initialState
        
 
@@ -257,16 +256,18 @@ inverse = fst . inverse'
 -- Basis
 showInBasis :: (Show b, Eq b) => [b] -> V b -> String
 showInBasis bs v =
-        let coef (V v) = v . delta
+        let coef (V v') = v' . delta
             pairs = map (\e -> (e, coef v e)) bs
             showPair (b, n) 
                | n == " + 1" = " + "  ++ show b
                | n == " - 1" = " - "  ++ show b
                | otherwise   = n      ++ show b
-            showN (b, n') = let n = (read $ printf "%0.5f" n' ) :: Double
-                                i = n == fromInteger (round n)
-                                sh = if i then show . round else show 
-                            in (b, if n > 0 then " + " ++ sh n else " - " ++ sh (abs n))
+            showN (b, n') = 
+                let n = (read $ printf "%0.5f" n' ) :: Double
+                    i = n == fromInteger (round n)
+                    sgn = if n > 0 then " + " else " - "
+                    sn = if i then show (round (abs n)) else show (abs n)
+                in (b, sgn ++ sn)
         in  case map (showPair . showN) . filter (\(_,n) -> n /= 0.0) $ pairs of 
                   [] -> " 0"
                   ss -> concat ss
