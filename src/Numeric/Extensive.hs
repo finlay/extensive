@@ -253,7 +253,9 @@ inverse :: (FiniteSet a, Eq a, Ord a, FiniteSet b, Eq b, Ord b)
         => (V a -> V b) -> V b -> V a
 inverse = fst . inverse'
 
--- Basis
+-- ----------------
+-- Display routines
+
 showInBasis :: (Show b, Eq b) => [b] -> V b -> String
 showInBasis bs v =
         let coef (V v') = v' . delta
@@ -264,9 +266,10 @@ showInBasis bs v =
                | otherwise   = n      ++ show b
             showN (b, n') = 
                 let n = (read $ printf "%0.5f" n' ) :: Double
-                    i = n == fromInteger (round n)
+                    rn = round n :: Integer
+                    i = n == fromInteger rn
                     sgn = if n > 0 then " + " else " - "
-                    sn = if i then show (round (abs n)) else show (abs n)
+                    sn = if i then show (abs rn) else show (abs n)
                 in (b, sgn ++ sn)
         in  case map (showPair . showN) . filter (\(_,n) -> n /= 0.0) $ pairs of 
                   [] -> " 0"
