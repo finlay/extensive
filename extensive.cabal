@@ -20,3 +20,5 @@ library
                        pretty      >= 1.1,
                        boxes       >= 0.1
   hs-source-dirs:      src
+
+  ghc-options:         -O2 -Wall 

@@ -3,7 +3,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 import System.Random
-import Control.Monad
 
 import Numeric.Extensive
 
@@ -33,7 +32,7 @@ main = do
     putStrLn "A = "
     printMap a
     
-    let (ainv, ds) = inverse' a
+    let (ainv, _) = inverse' a
 
     putStrLn "A^{-1} = "
     printMap ainv
