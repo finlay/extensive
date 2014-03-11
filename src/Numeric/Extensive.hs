@@ -128,6 +128,9 @@ dual x = V (\y -> sum $ map (\e -> x e * y e) elements)
 dot :: (Eq a, FiniteSet a) => V a -> V a -> R
 dot (V y) = y . codual
 
+pair :: V a -> (a -> R) -> R
+pair (V x) y = x y
+
 -- Transpose
 transpose :: (FiniteSet a, FiniteSet b, Eq a, Eq b) 
           => (V a -> V b) -> (V b -> V a)
