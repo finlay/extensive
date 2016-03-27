@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Numeric.Extensive where
 
@@ -10,21 +11,31 @@ import Control.Monad.State
 import Control.Applicative 
 import Text.Printf
 
+import Math.ContinuedFraction
+
 import Test.QuickCheck (Arbitrary)
 import qualified Test.QuickCheck as QC
 
 
 --type R = Rational ; epsilon = 0 -- slow and accurate
-type R = Double ; 
+type R = CF ; 
 epsilon :: R
 epsilon = 1e-6 -- fast and approximate 
-show' :: forall t. (PrintfType (R -> t)) => R -> t
-show' r = printf "%0.4f" $ if abs r < epsilon then 0 else r
+--show' :: forall t. (PrintfType (R -> t)) => R -> t
+--show' r = printf "%0.4f" $ if abs r < epsilon then 0 else r
+--show' :: R -> t
+show' = show
+instance Arbitrary R where 
+    arbitrary = fromInteger <$> QC.arbitrary
 
 newtype V a = V { unV :: ((a -> R) -> R) }
 
 instance Functor V where 
-    fmap f (V xs) = V $ xs . (flip ((flip id) . f))
+    fmap f (V xs) = V $ \r -> xs (r . f)
+
+instance Applicative V where
+  pure a = V $ \k -> k a
+  V mf <*> V ma = V $ \k -> mf $ \f -> ma $ k . f
 
 instance Monad V where
     return x      = V $ flip id x
@@ -49,6 +60,19 @@ tensor tx ty =  (join . (fmap t') . t'') (Tensor tx ty)
     where
         t'' (Tensor x y) = fmap (Tensor x) y
         t'  (Tensor x y) = fmap (flip Tensor y) x
+
+-- adj :: Hom(Va, Hom(Vb, Vc)) -> Hom(Va ⊗  Vb, Vc)
+adj :: (V a -> (V b -> V c)) -> V (Tensor a b) -> V c
+-- adj f (x ⊗ y) = f(x)(y) 
+adj f = extend $ \(Tensor a b) -> f (return a) (return b)
+-- iadj :: Hom(Va, Hom(Vb, Vc)) <- Hom(Va ⊗  Vb, Vc)
+iadj :: (V (Tensor a b) -> V c) -> V a -> V b -> V c
+-- iadj g x y = g (x ⊗ y)
+iadj g va vb = g (va `tensor` vb)
+
+
+hom' :: (V a -> V b) -> V (a,b) 
+hom' = undefined
 
 -- Hom represent linear maps.
 data Hom a b = Hom a b deriving (Eq, Ord)
@@ -92,9 +116,6 @@ instance (Show x, Show y) => Show (Tensor x y) where
 instance (Show x, Show y) => Show (Hom x y) where
     show (Hom x y) = show x ++ " \x21A6 " ++ show y
 
-delta :: (Eq x) => x -> x -> R
-delta a b = {-# SCC "delta" #-} if a == b then 1 else 0
-
 -- If we have a vector over a finite set, we can calculate the coefficients
 coefficients :: (FiniteSet x, Eq x) => V x -> [(x, R)]
 coefficients (V v) = map (\e -> (e, v (delta e))) elements
@@ -118,13 +139,20 @@ instance (Eq a, FiniteSet a, Ord a) => Ord (V a) where
 extend :: (Monad m) => (a -> m b) -> m a -> m b
 extend = flip (>>=)
 
-codual :: (Eq a) => V a -> (a -> R)
+delta :: Eq x => x -> x -> R
+delta a b = {-# SCC "delta" #-} if a == b then 1 else 0
+
+codual :: Eq a => V a -> (a -> R)
 codual (V x)  = x . delta
 
-dual :: (FiniteSet a, Eq a) => (a -> R) -> V a
-dual x = V (\y -> sum $ map (\e -> x e * y e) elements)
+-- return :: (a -> R) -> ((a -> R) -> R) -> R
+-- fmap delta' :: ((a -> R) -> R) -> (((a -> R) -> R) -> R)
+-- join   :: ((((a -> R) -> R) -> R) -> R) -> ((a -> R) -> R)
 
-dot :: (Eq a, FiniteSet a) => V a -> V a -> R
+dual :: (FiniteSet a, Eq a) => (a -> R) -> V a
+dual x = V $ \y -> sum $ map (\e -> x e * y e) elements
+
+dot :: Eq a => V a -> V a -> R
 dot (V y) = y . codual
 
 pair :: V a -> (a -> R) -> R
@@ -144,8 +172,10 @@ transpose lm = dual . flip (unV . lm . return) . codual
 rot :: Eq a => a -> a -> R -> V a -> V a
 rot x' y' t = extend $ r'
   where 
-    r' i' | x' == i'  =        (scale (cos t) (return x'))  `plus` (scale (sin t) (return y'))
-          | y' == i'  = (minus (scale (sin t) (return x'))) `plus` (scale (cos t) (return y'))
+    st a = scale (sin t) (return a)
+    ct a = scale (cos t) (return a)
+    r' i' | x' == i'  =        ct x'  `plus` st y'
+          | y' == i'  = minus (st x') `plus` ct y'
           | otherwise = return i'
 
 
@@ -176,7 +206,7 @@ diagStep (Diag r s) m =
 data DiagState a = DiagState { diags       :: [Diag a]
                              , transforms  :: [V a -> V a]
                              , result      :: V a -> V a 
-                             , count       :: Double
+                             , count       :: R
                              , diagsTotal  :: Int
                              , diagsLeft   :: Int
                              } deriving Show
@@ -224,7 +254,7 @@ diagonaliseSym maxcount ma =
         diagonalise = do
             m <- gets result
             c <- gets count
-            if c < maxcount && offNorm m > 1e-8 
+            if c < maxcount && offNorm m > 1/10^8 
                 then nextDiagStep >> diagonalise
                 else do 
                     m'  <- gets result
@@ -268,7 +298,8 @@ showInBasis bs v =
                | n == " - 1" = " - "  ++ show b
                | otherwise   = n      ++ show b
             showN (b, n') = 
-                let n = (read $ printf "%0.5f" n' ) :: Double
+                let --n = (read $ intf "%0.5f" n' ) :: Double
+                    n = n'
                     rn = round n :: Integer
                     i = n == fromInteger rn
                     sgn = if n > 0 then " + " else " - "
