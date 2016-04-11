@@ -15,11 +15,9 @@ library
   exposed-modules:     Numeric.Extensive
   -- other-modules:       
   build-depends:       base,
-                       algebra,
                        QuickCheck,
                        mtl,
                        pretty,
-                       cf,
                        boxes
   hs-source-dirs:      src
 
@@ -30,7 +28,6 @@ executable inverse
   main-is:             inverse.hs
   build-depends:       extensive,
                        QuickCheck,
-                       cf,
                        random,
                        base
   ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded

@@ -5,10 +5,7 @@
 import System.Random
 import Data.Maybe (catMaybes)
 
-import Test.QuickCheck (Arbitrary)
 import qualified Test.QuickCheck as QC
-
-import Math.ContinuedFraction
 
 import Numeric.Extensive
 
@@ -20,7 +17,7 @@ randomElement =
                       if r > 0.6 then return $ Just b
                                  else return Nothing
     els <- catMaybes `fmap` mapM choose elements
-    let sce b = fmap (\x -> scale x (return b)) (CF <$> QC.sample' QC.arbitrary )
+    let sce b = fmap (\x -> scale x (return b)) (QC.generate QC.arbitrary )
     cs <- mapM sce els
     return $ foldl1 plus cs
 

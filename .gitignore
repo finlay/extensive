@@ -4,4 +4,4 @@
 *.aux
 *.log
 *.pdf
-dist/
+.stack-work

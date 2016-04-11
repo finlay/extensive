@@ -8,25 +8,15 @@ module Numeric.Extensive where
 
 import Text.PrettyPrint.Boxes
 import Control.Monad.State
-import Control.Applicative 
-import Text.Printf
-
-import Math.ContinuedFraction
 
 import Test.QuickCheck (Arbitrary)
 import qualified Test.QuickCheck as QC
 
 
 --type R = Rational ; epsilon = 0 -- slow and accurate
-type R = CF ; 
+type R = Double ; 
 epsilon :: R
 epsilon = 1e-6 -- fast and approximate 
---show' :: forall t. (PrintfType (R -> t)) => R -> t
---show' r = printf "%0.4f" $ if abs r < epsilon then 0 else r
---show' :: R -> t
-show' = show
-instance Arbitrary R where 
-    arbitrary = fromInteger <$> QC.arbitrary
 
 newtype V a = V { unV :: ((a -> R) -> R) }
 
@@ -254,7 +244,7 @@ diagonaliseSym maxcount ma =
         diagonalise = do
             m <- gets result
             c <- gets count
-            if c < maxcount && offNorm m > 1/10^8 
+            if c < maxcount && offNorm m > 1/10^(8::Int) 
                 then nextDiagStep >> diagonalise
                 else do 
                     m'  <- gets result
@@ -322,7 +312,7 @@ mkBox m = box
         es = map return elements
         box = hsep 2 left cls
         cls = [ vsep 0 right (map (ts . snd) (coefficients (apply m e'))) | e' <- es]
-        ts = text . show'
+        ts = text . show
 
 printMap :: (FiniteSet a, FiniteSet b, Eq b, Eq a) 
          =>  (V a -> V b) -> IO ()
