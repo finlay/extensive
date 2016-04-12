@@ -18,18 +18,18 @@ type R = Double ;
 epsilon :: R
 epsilon = 1e-6 -- fast and approximate 
 
-newtype V a = V { unV :: ((a -> R) -> R) }
+newtype V a = V ((a -> R) -> R)
 
 instance Functor V where 
     fmap f (V xs) = V $ \r -> xs (r . f)
 
 instance Applicative V where
-  pure a = V $ \k -> k a
-  V mf <*> V ma = V $ \k -> mf $ \f -> ma $ k . f
+  pure a          = V $ \k -> k a
+  V mf <*> V ma   = V $ \k -> mf $ \f -> ma $ k . f
 
 instance Monad V where
-    return x      = V $ flip id x
-    (V x) >>= y   = V $ x . flip ( unV . y )
+    return x      = V $ \k -> k x
+    (V x) >>= y   = V $ \k -> x $ \f -> let V yf = y f in yf k 
 
 scale :: R  -> V a -> V a
 scale r (V x) = V $ (r *) . x 
@@ -139,6 +139,7 @@ codual (V x)  = x . delta
 -- fmap delta' :: ((a -> R) -> R) -> (((a -> R) -> R) -> R)
 -- join   :: ((((a -> R) -> R) -> R) -> R) -> ((a -> R) -> R)
 
+-- Expensive
 dual :: (FiniteSet a, Eq a) => (a -> R) -> V a
 dual x = V $ \y -> sum $ map (\e -> x e * y e) elements
 
@@ -151,7 +152,7 @@ pair (V x) y = x y
 -- Transpose
 transpose :: (FiniteSet a, FiniteSet b, Eq a, Eq b) 
           => (V a -> V b) -> (V b -> V a)
-transpose lm = dual . flip (unV . lm . return) . codual
+transpose lm = dual . (\b -> \a -> let V vb = lm $ return a in vb b) . codual
 
 
 -- --------------------
@@ -177,7 +178,7 @@ angle ct =
 
 makeRotation :: Eq a => (V a -> V a) -> a -> a -> (V a -> V a)
 makeRotation m x' y' = 
-    let mc a b = unV (m (return a)) (delta b)
+    let mc a b = let V mv = m (return a) in mv (delta b)
         ct = ((mc x' x') - (mc y' y')) / (2*(mc x' y'))
     in  rot x' y' (angle ct)
 
@@ -202,7 +203,7 @@ data DiagState a = DiagState { diags       :: [Diag a]
                              } deriving Show
 nextDiagStep :: (FiniteSet a, Eq a) => State (DiagState a) ()
 nextDiagStep =
-    let mc ma (Diag a b) = unV (ma (return a)) (delta b)
+    let mc ma (Diag a b) = let V mav = ma (return a) in mav (delta b)
     in do
         s <- get
         let d:ds = diags s
@@ -255,7 +256,7 @@ diagonaliseSym maxcount ma =
 
 offNorm :: (FiniteSet a, Eq a, Ord a) => (V a -> V a) -> R
 offNorm m = 
-  let mc (Diag a b) = unV (m (return a)) (delta b)
+  let mc (Diag a b) = let V ma = m (return a) in ma (delta b)
   in  sum $ map ((**2) . mc) offdiag
 
 
