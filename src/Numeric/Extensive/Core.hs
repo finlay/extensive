@@ -6,7 +6,6 @@ import Test.QuickCheck (Arbitrary)
 import qualified Test.QuickCheck as QC
 
 
---type R = Rational ; epsilon = 0 -- slow and accurate
 type R = Double ; 
 epsilon :: R
 epsilon = 1e-6 -- fast and approximate 
