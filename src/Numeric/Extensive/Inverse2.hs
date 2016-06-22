@@ -2,39 +2,37 @@ module Numeric.Extensive.Inverse2 where
 
 import Numeric.Extensive.Core
 
-inverse :: (V a -> V b) -> V b -> V a
+inverse 
+  :: (Eq b, FiniteSet a, FiniteSet b) 
+  => (V a -> V b) -> V b -> V a
 inverse = complete . loop . initialise
 
-data OffDiagonals b = OD (b -> b -> R)
-
 data LoopState a b
-  = LS (OffDiagonals b) (V a -> V b) (V b -> V a)
+  = LS (V a -> V b) (V b -> V a)
 
-initialise :: (V a -> V b) -> LoopState a b
+initialise 
+  :: (Eq b, FiniteSet a, FiniteSet b) 
+  => (V a -> V b) -> LoopState a b
 initialise l 
   = let (b:bs) = elements
         (a:as) = elements
         e b' = if b == b' then return a else zero 
         res = extend e
-
-    in  LS (offDiagonals l) l res
-
-offDiagonals :: (V a -> V b) -> OffDiagonals b 
-offDiagonals = undefined
+    in  LS l res
 
 complete :: LoopState a b -> V b -> V a
-complete (LS _ _ out) = out
+complete (LS _ out) = out
 
-done :: LoopState a b -> Bool
-done (LS diags _ _ ) = diagsAreZero diags
-
-diagsAreZero :: OffDiagonals b -> Bool
-diagsAreZero = undefined
+diagsAreZero :: (V b -> V b) -> Maybe (R, a,b)
+diagsAreZero e
+  = undefined
 
 loop :: LoopState a b -> LoopState a b
-loop ls = 
-    if done ls
-        then ls
-        else loop ls
+loop (LS l r) = 
+  case diagsAreZero (l . r) of
+    Nothing -> LS l r
+    Just (c, x, y) 
+      -> let r' = r . diag c x y
+         in  loop (LS l r')
 
             
