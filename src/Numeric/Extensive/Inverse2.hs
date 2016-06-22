@@ -3,21 +3,35 @@ module Numeric.Extensive.Inverse2 where
 import Numeric.Extensive.Core
 
 inverse :: (V a -> V b) -> V b -> V a
-inverse = complete . loop . initalise
+inverse = complete . loop . initialise
 
-data LoopState 
-  = LS OffDiagonals (V a -> V b) (V b -> V a)
+data OffDiagonals b = OD (b -> b -> R)
 
-intialise :: (V a -> V b) -> LoopState
-initalise l = LS (offDiagonals l) l (undefined)
+data LoopState a b
+  = LS (OffDiagonals b) (V a -> V b) (V b -> V a)
 
-complete :: LoopState -> V b -> V a
+initialise :: (V a -> V b) -> LoopState a b
+initialise l 
+  = let (b:bs) = elements
+        (a:as) = elements
+        e b' = if b == b' then return a else zero 
+        res = extend e
+
+    in  LS (offDiagonals l) l res
+
+offDiagonals :: (V a -> V b) -> OffDiagonals b 
+offDiagonals = undefined
+
+complete :: LoopState a b -> V b -> V a
 complete (LS _ _ out) = out
 
-done :: LoopState -> Bool
+done :: LoopState a b -> Bool
 done (LS diags _ _ ) = diagsAreZero diags
 
-loop :: LoopState -> LoopState
+diagsAreZero :: OffDiagonals b -> Bool
+diagsAreZero = undefined
+
+loop :: LoopState a b -> LoopState a b
 loop ls = 
     if done ls
         then ls
