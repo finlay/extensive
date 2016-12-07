@@ -7,6 +7,8 @@ do
     sleep 1;
 done;
 
+## HERE WE ARE
+
 cp extensive.cabal /output/
 cp *.hs /output/
 cp *.sh /output/
