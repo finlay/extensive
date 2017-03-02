@@ -8,17 +8,13 @@ inverse
 inverse = complete . loop . initialise
 
 data LoopState a b
-  = LS (T a -> T b) (T b -> T a)
+  = LS (V a -> V b) (V a -> V a)
 
 initialise 
   :: (Eq b, FiniteSet a, FiniteSet b) 
   => (T a -> T b) -> LoopState a b
 initialise l 
-  = let (b:bs) = elements
-        (a:as) = elements
-        e b' = if b == b' then return a else zero 
-        res = extend e
-    in  LS l res
+  = LS l (transpose l . l)
 
 complete :: LoopState a b -> T b -> T a
 complete (LS _ out) = out
@@ -30,12 +26,6 @@ diagsAreZero e
   = undefined
 
 loop :: LoopState a b -> LoopState a b
-loop (LS l r)
-  = undefined
---   case diagsAreZero (l . r) of
---     Nothing -> LS l r
---     Just (c, x, y) 
---       -> let r' = r . diag c x y
---          in  loop (LS l r')
+loop (LS l r) = undefined
 
             
