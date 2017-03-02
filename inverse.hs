@@ -3,54 +3,59 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 import System.Random
-import Data.Maybe (catMaybes)
-
 import qualified Test.QuickCheck as QC
-
 import Numeric.Extensive
 
 -- Make a random matrix
-randomElement :: (FiniteSet a) => IO (V a)
-randomElement = 
- do 
-    let choose b = do r :: Double <- randomRIO (0, 1)
-                      if r > 0.6 then return $ Just b
-                                 else return Nothing
-    els <- catMaybes `fmap` mapM choose elements
-    let sce b = fmap (\x -> scale x (return b)) (QC.generate QC.arbitrary )
-    cs <- mapM sce els
-    return $ foldl1 plus cs
+randomElement :: (FiniteSet a) => Double -> IO (T a)
+randomElement p 
+  = foldl1 plus <$> (mapM sce =<< els)
+  where
+      bernoulli :: (Num a, Ord a, Random a) => a -> IO Bool
+      bernoulli p = (> p) <$> randomRIO (0, 1)
+      choose :: Double -> a -> a -> IO a
+      choose p a b =
+          do r <- bernoulli p
+             return $ if r then a else b
+      els :: FiniteSet a => IO [T a]
+      els = mapM (choose p zero . return) elements
+      sce :: T a -> IO (T a)
+      sce b = fmap (\x -> scale x b) (QC.generate QC.arbitrary )
 
-randomMatrix :: (FiniteSet a, Eq a, FiniteSet b, Eq b) => IO (V a -> V b)
-randomMatrix = fmap apply randomElement
+randomMatrix 
+    :: (FiniteSet a, Eq a, FiniteSet b, Eq b) 
+    => Double -> IO (T a -> T b)
+randomMatrix p = apply <$> randomElement p
 
-data H = E | I | J | K deriving (Eq, Ord)
+data H = E | I | J | K deriving (Eq, Ord, Show)
 instance FiniteSet H where elements = [ E, I, J, K ]
 
 data C = C Int deriving (Eq, Ord)
 instance FiniteSet C where elements = [ C i | i <- [1 .. 2] ]
 instance Show C where show (C i) = "C_"++show i 
 
-main :: IO ()
-main = do 
+run :: Double -> IO ()
+run p = do 
     
     -- Generate random three by three linear transformation
-    (a :: V C -> V C)  <- randomMatrix
-    --(a :: V (Tensor H H) -> V (Tensor H H))  <- randomMatrix
+    --(a :: T C -> T C)  <- randomMatrix p
+    --(a :: T (Tensor H H) -> T (Tensor H H))  <- randomMatrix p
+    (a :: T H -> T H)  <- randomMatrix p
     putStrLn "A = "
     printMap a
     
-    let (ainv, _) = inverse' a
+    let ainv = transpose a -- inverse' a
 
-    putStrLn "A^{-1} = "
+    putStrLn "A^T" -- {-1} = "
     printMap ainv
--- 
---     putStrLn "Check..."
---     print (offNorm $ ainv . a)
--- 
--- 
---     putStrLn "Done"
--- 
 
+    putStrLn "Check..."
+    print (ainv . a)
+
+    putStrLn "Done"
+ 
+
+main :: IO()
+main = run 0.5
 
 

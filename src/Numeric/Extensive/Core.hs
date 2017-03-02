@@ -10,30 +10,30 @@ type R = Double ;
 epsilon :: R
 epsilon = 1e-6 -- fast and approximate 
 
-newtype V a = V ((a -> R) -> R)
+newtype T a = T ((a -> R) -> R)
 
-instance Functor V where 
-    fmap f (V xs) = V $ \r -> xs (r . f)
+instance Functor T where 
+    fmap f (T xs) = T $ \r -> xs (r . f)
 
-instance Applicative V where
-  pure a          = V $ \k -> k a
-  V mf <*> V ma   = V $ \k -> mf $ \f -> ma $ k . f
+instance Applicative T where
+  pure a          = T $ \k -> k a
+  T mf <*> T ma   = T $ \k -> mf $ \f -> ma $ k . f
 
-instance Monad V where
-    return x      = V $ \k -> k x
-    (V x) >>= y   = V $ \k -> x $ \f -> let V yf = y f in yf k 
+instance Monad T where
+    return x      = T $ \k -> k x
+    (T x) >>= y   = T $ \k -> x $ \f -> let T yf = y f in yf k 
 
-scale :: R  -> V a -> V a
-scale r (V x) = V $ (r *) . x 
+scale :: R  -> T a -> T a
+scale r (T x) = T $ (r *) . x 
 
-zero :: V a
-zero = V $ const 0
+zero :: T a
+zero = T $ const 0
 
-minus :: V a -> V a
-minus (V x) = V $ negate . x 
+minus :: T a -> T a
+minus (T x) = T $ negate . x 
 
-plus :: V a -> V a -> V a
-plus (V x) (V y) = V $ (\ar -> x ar + y ar)
+plus :: T a -> T a -> T a
+plus (T x) (T y) = T $ (\ar -> x ar + y ar)
 
 -- Extending a map into a the Vector space is easy peasy using the Monad instance
 -- Automatically linear
@@ -43,18 +43,18 @@ extend = flip (>>=)
 
 -- Tensor products are just pairs
 data Tensor a b = Tensor a b deriving (Eq, Ord)
-tensor :: V a -> V b -> V (Tensor a b)
+tensor :: T a -> T b -> T (Tensor a b)
 tensor tx ty =  (join . (fmap t') . t'') (Tensor tx ty)
     where
         t'' (Tensor x y) = fmap (Tensor x) y
         t'  (Tensor x y) = fmap (flip Tensor y) x
 
 -- adj :: Hom(Va, Hom(Vb, Vc)) -> Hom(Va ⊗  Vb, Vc)
-adj :: (V a -> (V b -> V c)) -> V (Tensor a b) -> V c
+adj :: (T a -> (T b -> T c)) -> T (Tensor a b) -> T c
 -- adj f (x ⊗ y) = f(x)(y) 
 adj f = extend $ \(Tensor a b) -> f (return a) (return b)
 -- iadj :: Hom(Va, Hom(Vb, Vc)) <- Hom(Va ⊗  Vb, Vc)
-iadj :: (V (Tensor a b) -> V c) -> V a -> V b -> V c
+iadj :: (T (Tensor a b) -> T c) -> T a -> T b -> T c
 -- iadj g x y = g (x ⊗ y)
 iadj g va vb = g (va `tensor` vb)
 
@@ -64,27 +64,27 @@ data Hom a b = Hom a b deriving (Eq, Ord)
 
 -- This is an expensive operation (it calles elements)
 hom :: (FiniteSet a, FiniteSet b, Eq b) 
-    => (V a -> V b) -> V (Hom a b)
+    => (T a -> T b) -> T (Hom a b)
 hom l = 
   let xs = elements
       coefs = coefficients . l . return
   in  foldl1 plus [scale c (return (Hom x' y')) | x' <- xs, (y',c) <- coefs x']
 
 apply :: (Eq a) 
-      => V (Hom a b) -> V a -> V b
+      => T (Hom a b) -> T a -> T b
 apply = curry (unMaybe . fmap ex . uncurry tensor)
   where
     unMaybe = extend (maybe zero return)
     ex (Tensor (Hom x y) x') = {-# SCC "ex" #-} if x == x' then Just y else Nothing
 
-em :: (Eq a) => Hom a b -> V a -> V b
-em (Hom x y) (V vx) = 
+em :: (Eq a) => Hom a b -> T a -> T b
+em (Hom x y) (T vx) = 
   let em' vy x' = if x == x' then vy y else 0
-  in  V $ vx . em'
+  in  T $ vx . em'
 
 -- memoised multiplication
 mmul :: (Eq a, FiniteSet a, Eq c, FiniteSet c) 
-     => (V b -> V c) -> (V a -> V b) -> (V a -> V c)
+     => (T b -> T c) -> (T a -> T b) -> (T a -> T c)
 mmul a b =  {-# SCC "mmul" #-} apply . hom $ (a . b)
 
 -- Finite sets can be listed, which is elements
@@ -103,20 +103,20 @@ instance (Show x, Show y) => Show (Hom x y) where
     show (Hom x y) = show x ++ " \x21A6 " ++ show y
 
 -- If we have a vector over a finite set, we can calculate the coefficients
-coefficients :: (FiniteSet x, Eq x) => V x -> [(x, R)]
-coefficients (V v) = map (\e -> (e, v (delta e))) elements
+coefficients :: (FiniteSet x, Eq x) => T x -> [(x, R)]
+coefficients (T v) = map (\e -> (e, v (delta e))) elements
 
 -- Equality instances are only ever approximate.
 --instance (Eq a, FiniteSet a) => Eq (a -> R) where
 --    x == y = all (\e -> x e == y e) elements
 
-instance (Eq a, FiniteSet a) => Eq (V a) where
+instance (Eq a, FiniteSet a) => Eq (T a) where
     x' == y' =  {-# SCC "EQUALS" #-} sum (map (squared . snd) ( coefficients (subtract' x' y'))) <= epsilon
               where 
                 squared x'' = x'' * x''
-                subtract' (V x'') (V y'') = V $ (\ar -> x'' ar - y'' ar)
+                subtract' (T x'') (T y'') = T $ (\ar -> x'' ar - y'' ar)
 
-instance (Eq a, FiniteSet a, Ord a) => Ord (V a) where
+instance (Eq a, FiniteSet a, Ord a) => Ord (T a) where
     compare x y = compare (coefficients x) (coefficients y)
 
 
@@ -124,24 +124,24 @@ instance (Eq a, FiniteSet a, Ord a) => Ord (V a) where
 delta :: Eq x => x -> x -> R
 delta a b = {-# SCC "delta" #-} if a == b then 1 else 0
 
-codual :: Eq a => V a -> (a -> R)
-codual (V x)  = x . delta
+codual :: Eq a => T a -> (a -> R)
+codual (T x)  = x . delta
 
 -- return :: (a -> R) -> ((a -> R) -> R) -> R
 -- fmap delta' :: ((a -> R) -> R) -> (((a -> R) -> R) -> R)
 -- join   :: ((((a -> R) -> R) -> R) -> R) -> ((a -> R) -> R)
 
 -- Expensive
-dual :: (FiniteSet a, Eq a) => (a -> R) -> V a
-dual x = V $ \y -> sum $ map (\e -> x e * y e) elements
+dual :: (FiniteSet a, Eq a) => (a -> R) -> T a
+dual x = T $ \y -> sum $ map (\e -> x e * y e) elements
 
-dot :: Eq a => V a -> V a -> R
-dot (V y) = y . codual
+dot :: Eq a => T a -> T a -> R
+dot (T y) = y . codual
 
 -- Transpose
 transpose :: (FiniteSet a, FiniteSet b, Eq a, Eq b) 
-          => (V a -> V b) -> (V b -> V a)
-transpose lm = dual . (\b -> \a -> let V vb = lm $ return a in vb b) . codual
+          => (T a -> T b) -> (T b -> T a)
+transpose lm = dual . (\b -> \a -> let T vb = lm $ return a in vb b) . codual
 
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (Tensor a b) where
@@ -150,7 +150,7 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (Tensor a b) where
 instance (Arbitrary a, Arbitrary b) => Arbitrary (Hom a b) where
     arbitrary = Hom    <$> QC.arbitrary <*> QC.arbitrary
 
-instance (Arbitrary a) => Arbitrary (V a)
+instance (Arbitrary a) => Arbitrary (T a)
   where
     arbitrary = 
       do

@@ -15,7 +15,7 @@ library
   exposed-modules:     Numeric.Extensive
                      , Numeric.Extensive.Core
                      , Numeric.Extensive.Inverse
-                     , Numeric.Extensive.Inverse2
+--                     , Numeric.Extensive.Inverse2
                      , Numeric.Extensive.Print
   -- other-modules:       
   build-depends:       base,

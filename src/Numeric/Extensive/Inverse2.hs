@@ -4,15 +4,15 @@ import Numeric.Extensive.Core
 
 inverse 
   :: (Eq b, FiniteSet a, FiniteSet b) 
-  => (V a -> V b) -> V b -> V a
+  => (T a -> T b) -> T b -> T a
 inverse = complete . loop . initialise
 
 data LoopState a b
-  = LS (V a -> V b) (V b -> V a)
+  = LS (T a -> T b) (T b -> T a)
 
 initialise 
   :: (Eq b, FiniteSet a, FiniteSet b) 
-  => (V a -> V b) -> LoopState a b
+  => (T a -> T b) -> LoopState a b
 initialise l 
   = let (b:bs) = elements
         (a:as) = elements
@@ -20,19 +20,22 @@ initialise l
         res = extend e
     in  LS l res
 
-complete :: LoopState a b -> V b -> V a
+complete :: LoopState a b -> T b -> T a
 complete (LS _ out) = out
 
-diagsAreZero :: (V b -> V b) -> Maybe (R, a,b)
+-- Question about how to stop the loop
+-- Lets try to skip this bit
+diagsAreZero :: (T b -> T b) -> Maybe (R, a,b)
 diagsAreZero e
   = undefined
 
 loop :: LoopState a b -> LoopState a b
-loop (LS l r) = 
-  case diagsAreZero (l . r) of
-    Nothing -> LS l r
-    Just (c, x, y) 
-      -> let r' = r . diag c x y
-         in  loop (LS l r')
+loop (LS l r)
+  = undefined
+--   case diagsAreZero (l . r) of
+--     Nothing -> LS l r
+--     Just (c, x, y) 
+--       -> let r' = r . diag c x y
+--          in  loop (LS l r')
 
             

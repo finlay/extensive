@@ -10,7 +10,7 @@ import Numeric.Extensive.Core
 -- uses a Jakobi approach
 
 -- Create a rotation on an off diagonal for a endomorphism
-rot :: Eq a => a -> a -> R -> V a -> V a
+rot :: Eq a => a -> a -> R -> T a -> T a
 rot x' y' t = extend $ r'
   where 
     st a = scale (sin t) (return a)
@@ -26,9 +26,9 @@ angle ct =
     let sgn a = a / abs a
     in atan $ (sgn ct) / ((abs ct) + (sqrt (1 + ct*ct)))
 
-makeRotation :: Eq a => (V a -> V a) -> a -> a -> (V a -> V a)
+makeRotation :: Eq a => (T a -> T a) -> a -> a -> (T a -> T a)
 makeRotation m x' y' = 
-    let mc a b = let V mv = m (return a) in mv (delta b)
+    let mc a b = let T mv = m (return a) in mv (delta b)
         ct = ((mc x' x') - (mc y' y')) / (2*(mc x' y'))
     in  rot x' y' (angle ct)
 
@@ -38,22 +38,22 @@ offdiag :: (FiniteSet a, Ord a) => [ Diag a ]
 offdiag = [ Diag x' y' | x' <- elements, y' <- elements, x' < y']
 
 diagStep :: (FiniteSet a, Eq a) 
-         => Diag a -> (V a -> V a) -> (V a -> V a, V a -> V a)
+         => Diag a -> (T a -> T a) -> (T a -> T a, T a -> T a)
 diagStep (Diag r s) m = 
         let !t' = makeRotation m r s
             !m' = (transpose t') `mmul` m `mmul` t'
         in (m', t')
 
 data DiagState a = DiagState { diags       :: [Diag a]
-                             , transforms  :: [V a -> V a]
-                             , result      :: V a -> V a 
+                             , transforms  :: [T a -> T a]
+                             , result      :: T a -> T a 
                              , count       :: R
                              , diagsTotal  :: Int
                              , diagsLeft   :: Int
                              }
 nextDiagStep :: (FiniteSet a, Eq a) => State (DiagState a) ()
 nextDiagStep =
-    let mc ma (Diag a b) = let V mav = ma (return a) in mav (delta b)
+    let mc ma (Diag a b) = let T mav = ma (return a) in mav (delta b)
     in do
         s <- get
         let d:ds = diags s
@@ -81,7 +81,7 @@ nextDiagStep =
 
 -- Diagonalise a symmetric matrix
 diagonaliseSym :: (FiniteSet a, Eq a, Ord a) 
-               => R -> (V a -> V a) -> ((V a -> V a, [V a -> V a]), DiagState a)
+               => R -> (T a -> T a) -> ((T a -> T a, [T a -> T a]), DiagState a)
 diagonaliseSym maxcount ma = 
     let ds = offdiag
         dds = foldr1 (++) (repeat ds)
@@ -104,27 +104,27 @@ diagonaliseSym maxcount ma =
     in  runState diagonalise initialState
        
 
-offNorm :: (FiniteSet a, Eq a, Ord a) => (V a -> V a) -> R
+offNorm :: (FiniteSet a, Eq a, Ord a) => (T a -> T a) -> R
 offNorm m = 
-  let mc (Diag a b) = let V ma = m (return a) in ma (delta b)
+  let mc (Diag a b) = let T ma = m (return a) in ma (delta b)
   in  sum $ map ((**2) . mc) offdiag
 
 
 inverse' :: (FiniteSet a, Eq a, Ord a, FiniteSet b, Eq b, Ord b)
-         => (V a -> V b) -> (V b -> V a, DiagState a)
+         => (T a -> T b) -> (T b -> T a, DiagState a)
 inverse' l = 
     let ltl   = transpose l `mmul` l
         (steps, ds) = diagonaliseSym 1000 ltl
         lt    = foldl1 mmul (reverse $ snd steps)
         d     = fst steps
-        V hd  = hom d 
+        T hd  = hom d 
         de s' = scale (1/(sqrt (hd (delta (Hom s' s'))))) (return (Hom s' s'))
         dinv  = apply $ (foldl1 plus [ de s | s <- elements ])
         rt    = l `mmul` lt `mmul` dinv
         linv  = lt `mmul` dinv `mmul` (transpose rt)
     in (linv, ds)
 inverse :: (FiniteSet a, Eq a, Ord a, FiniteSet b, Eq b, Ord b)
-        => (V a -> V b) -> V b -> V a
+        => (T a -> T b) -> T b -> T a
 inverse = fst . inverse'
 
 
