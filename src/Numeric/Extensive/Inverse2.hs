@@ -42,7 +42,7 @@ decompose
 decompose (LS d r []) = (d,r)
 decompose ls@(LS d r ((x,y):diags))
   = let T dx = d (return x) 
-        c = traceShowId $ dx (delta y)
+        c = dx (delta y)
         ls' = if isZero c 
                 then (LS d r diags) 
                 else loop c ls
@@ -53,7 +53,7 @@ loop
   => R -> LoopState a -> LoopState a
 loop _ (LS _ _ []) = error "Can't get here"
 loop c (LS d r ((x,y):diags))
-  = let rot = traceShowId $ makeRotation (angle c) x y
+  = let rot = makeRotation (angle c) x y
         d' = d . rot
         r' = (transpose rot) . r
     in  LS d' r' (diags ++ [(x,y)])
@@ -61,7 +61,7 @@ loop c (LS d r ((x,y):diags))
 angle :: R -> R
 angle ct = 
     let sgn a = a / abs a
-    in traceShowId $ atan $ (sgn ct) / ((abs ct) + (sqrt (1 + ct*ct)))
+    in atan $ (sgn ct) / ((abs ct) + (sqrt (1 + ct*ct)))
 
 makeRotation
   :: (Eq a, FiniteSet a) 
@@ -74,3 +74,7 @@ makeRotation t x y
     r i | x == i    =        ct x  `plus` st y
         | y == i    = minus (st x) `plus` ct y
         | otherwise = return i
+
+
+
+
