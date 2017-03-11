@@ -44,9 +44,9 @@ run p = do
     putStrLn "A = "
     printMap a
     
-    let ainv = transpose a -- inverse' a
+    let ainv = a
 
-    putStrLn "A^T" -- {-1} = "
+    putStrLn "A^{-1} = "
     printMap ainv
 
     putStrLn "Check..."
