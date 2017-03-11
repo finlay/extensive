@@ -44,7 +44,7 @@ run p = do
     putStrLn "A = "
     printMap a
     
-    let ainv = a
+    let ainv = inverse a
 
     putStrLn "A^{-1} = "
     printMap ainv

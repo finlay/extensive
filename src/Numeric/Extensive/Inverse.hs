@@ -1,7 +1,8 @@
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE BangPatterns #-}
 module Numeric.Extensive.Inverse where
 
+import Debug.Trace
 import Numeric.Extensive.Core
 
 --   \begin{align*}
@@ -13,11 +14,11 @@ import Numeric.Extensive.Core
 
 type End a = T a -> T a
 
-inverse2 
+inverse 
   :: (Show a, Eq a, Eq b, Ord a, 
       FiniteSet a, FiniteSet b, Show (T a -> T a)) 
   => (T a -> T b) -> T b -> T a
-inverse2 a
+inverse a
   = let at = transpose a
         diags = [ (x,y) | x <- elements , y <- elements , x < y ]
         ls = LS (at . a) id diags
@@ -31,30 +32,33 @@ invDiagonal l
     in  extend base
 
 data LoopState a
-  = LS (End a)      -- transpose $ D := A^TA  $
-       (End a)      -- rotation  $ R := Id    $
+  = LS !(End a)      -- transpose $ D := A^TA  $
+       !(End a)      -- rotation  $ R := Id    $
        [(a,a)]      -- diagonals that need checking
 
 isZero :: R -> Bool
 isZero r = abs r < 1e-8
 
 loop
-  :: (Show a, Eq a, FiniteSet a, Show (T a -> T a)) 
+  :: (Show a, Eq a, Ord a, FiniteSet a, Show (T a -> T a)) 
   => LoopState a -> (End a, End a)
 loop (LS d r []) = (d,r)
-loop ls@(LS d r ((x,y):diags))
-  = let T dx = d (return x)
-        c = dx (delta y)
+loop (LS d r (diag@(x,y):diags))
+  = let c = traceShowId $ let T dx = d (return x) in dx (delta y)
     in if isZero c
           then loop (LS d r diags) 
-          else let rot = makeRotation d x y
-                   d' = transpose rot . d . rot
-               in  loop (LS d' (r . rot) (diags ++ [(x,y)]))
+          else let rot = makeRotation d diag
+                   d'  = traceShowId $ transpose rot . d . rot
+                   diags' 
+                    = diags 
+                        ++ [ (x,y') | y' <- elements, y /= y', x < y']
+                        ++ [ (x',y) | x' <- elements, x /= x', x' < y]
+               in  loop (LS d' (r . rot) diags')
 
 makeRotation 
     :: (Eq a, FiniteSet a)
-    => (T a -> T a) -> a -> a -> (T a -> T a)
-makeRotation m x y = 
+    => (T a -> T a) -> (a, a) -> (T a -> T a)
+makeRotation m (x, y) = 
     let mc a b = let T mv = m (return a) in mv (delta b)
         ct = ((mc x x) - (mc y y)) / (2*(mc x y))
     in  rot x y (angle ct)
