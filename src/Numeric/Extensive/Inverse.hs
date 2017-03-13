@@ -34,7 +34,9 @@ inverse a
 invDiagonal :: (Eq a) => End a -> End a
 invDiagonal l
   = let coef x = let T v = l (return x) in v (delta x)
-        base x = scale (recip $ coef x) (return x)
+        base x = if isZero (coef x)
+                    then zero
+                    else scale (recip $ coef x) (return x)
     in  extend base
 
 data LoopState a

@@ -40,8 +40,8 @@ run p = do
     -- Generate random three by three linear transformation
     --(a :: T C -> T C)  <- randomMatrix p
     --(a :: T (Tensor C C) -> T (Tensor C C))  <- randomMatrix p
-    (a :: T (Tensor H H) -> T (Tensor H H))  <- randomMatrix p
-    --(a :: T H -> T H)  <- randomMatrix p
+    --(a :: T (Tensor H H) -> T (Tensor H H))  <- randomMatrix p
+    (a :: T H -> T H)  <- randomMatrix p
     putStrLn "A = "
     printMap a
     
