@@ -19,17 +19,34 @@ force :: (Eq a, FiniteSet a, Eq b, FiniteSet b)
       => (T a -> T b) -> T a -> T b
 force = apply . hom
 
-
-inverse 
+inverse
   :: (Show a, Eq a, Eq b, Ord a, 
       FiniteSet a, FiniteSet b, Show (T a -> T a)) 
   => (T a -> T b) -> T b -> T a
-inverse a
+inverse = inversePre
+
+inversePre 
+  :: (Show a, Eq a, Eq b, Ord a, 
+      FiniteSet a, FiniteSet b, Show (T a -> T a)) 
+  => (T a -> T b) -> T b -> T a
+inversePre a
   = let at = transpose a
         diags = [ (x,y) | x <- elements , y <- elements , x < y ]
         ls = LS (force $ at . a) id diags
         (d,r) = loop ls
     in  force $ r . invDiagonal d . transpose r . at
+
+inversePost
+  :: (Show b, Eq a, Eq b, Ord b, 
+      FiniteSet a, FiniteSet b, Show (T b -> T b)) 
+  => (T a -> T b) -> T b -> T a
+inversePost a
+  = let at = transpose a
+        diags = [ (x,y) | x <- elements , y <- elements , x < y ]
+        ls = LS (force $ a . at) id diags
+        (d,r) = loop ls
+    in  force $ at . r . invDiagonal d . transpose r
+
 
 invDiagonal :: (Eq a) => End a -> End a
 invDiagonal l
