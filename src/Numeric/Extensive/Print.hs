@@ -2,6 +2,7 @@
 module Numeric.Extensive.Print where
 
 import Text.PrettyPrint.Boxes
+import Text.Printf
 
 import Numeric.Extensive.Core
 
@@ -37,7 +38,7 @@ mkBox m = box
         es = map return elements
         box = hsep 2 left cls
         cls = [ vsep 0 right (map (ts . snd) (coefficients (apply m e'))) | e' <- es]
-        ts = text . show
+        ts = text . printf "%0.4f"
 
 printMap :: (FiniteSet a, FiniteSet b, Eq b, Eq a) 
          =>  (T a -> T b) -> IO ()

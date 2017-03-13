@@ -2,7 +2,7 @@
 {-# LANGUAGE BangPatterns #-}
 module Numeric.Extensive.Inverse where
 
-import Debug.Trace
+--import Debug.Trace
 import Numeric.Extensive.Core
 
 --   \begin{align*}
@@ -14,6 +14,12 @@ import Numeric.Extensive.Core
 
 type End a = T a -> T a
 
+-- force the evaluation of the endomorphism (something like memoization)
+force :: (Eq a, FiniteSet a, Eq b, FiniteSet b) 
+      => (T a -> T b) -> T a -> T b
+force = apply . hom
+
+
 inverse 
   :: (Show a, Eq a, Eq b, Ord a, 
       FiniteSet a, FiniteSet b, Show (T a -> T a)) 
@@ -21,9 +27,9 @@ inverse
 inverse a
   = let at = transpose a
         diags = [ (x,y) | x <- elements , y <- elements , x < y ]
-        ls = LS (at . a) id diags
+        ls = LS (force $ at . a) id diags
         (d,r) = loop ls
-    in  r . invDiagonal d . transpose r . at
+    in  force $ r . invDiagonal d . transpose r . at
 
 invDiagonal :: (Eq a) => End a -> End a
 invDiagonal l
@@ -32,8 +38,8 @@ invDiagonal l
     in  extend base
 
 data LoopState a
-  = LS !(End a)      -- transpose $ D := A^TA  $
-       !(End a)      -- rotation  $ R := Id    $
+  = LS (End a)      -- transpose $ D := A^TA  $
+       (End a)      -- rotation  $ R := Id    $
        [(a,a)]      -- diagonals that need checking
 
 isZero :: R -> Bool
@@ -44,16 +50,15 @@ loop
   => LoopState a -> (End a, End a)
 loop (LS d r []) = (d,r)
 loop (LS d r (diag@(x,y):diags))
-  = let c = traceShowId $ let T dx = d (return x) in dx (delta y)
+  = let c = let T dx = d (return x) in dx (delta y)
     in if isZero c
-          then loop (LS d r diags) 
-          else let rot = makeRotation d diag
-                   d'  = traceShowId $ transpose rot . d . rot
-                   diags' 
-                    = diags 
-                        ++ [ (x,y') | y' <- elements, y /= y', x < y']
-                        ++ [ (x',y) | x' <- elements, x /= x', x' < y]
-               in  loop (LS d' (r . rot) diags')
+       then loop (LS d r diags) 
+       else let rot = makeRotation d diag
+                d'  = transpose rot . d . rot
+                newdiags = [ (x ,y') | y' <- elements, y /= y', x  < y']
+                        ++ [ (x',y ) | x' <- elements, x /= x', x' < y ]
+                diags' = diags ++ [ d | d <- newdiags, not (elem d diags)]
+            in  loop (LS (force d') (force $ r . rot) diags')
 
 makeRotation 
     :: (Eq a, FiniteSet a)
