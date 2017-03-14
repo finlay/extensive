@@ -4,6 +4,10 @@
 
 import System.Random
 import qualified Test.QuickCheck as QC
+
+import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
+import qualified Prelude
+
 import Numeric.Extensive
 
 -- Make a random matrix
@@ -12,7 +16,7 @@ randomElement p
   = foldl1 plus <$> (mapM sce =<< els)
   where
       bernoulli :: (Num a, Ord a, Random a) => a -> IO Bool
-      bernoulli p = (> p) <$> randomRIO (0, 1)
+      bernoulli p = (Prelude.> p) <$> randomRIO (0, 1)
       choose :: Double -> a -> a -> IO a
       choose p a b =
           do r <- bernoulli p
@@ -28,6 +32,7 @@ randomMatrix
 randomMatrix p = apply <$> randomElement p
 
 data H = E | I | J | K deriving (Eq, Ord, Show)
+instance Order H where order a b = Just (compare a b)
 instance FiniteSet H where elements = [ E, I, J, K ]
 
 data C = C Int deriving (Eq, Ord)

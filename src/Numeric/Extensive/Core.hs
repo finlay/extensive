@@ -1,3 +1,7 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Numeric.Extensive.Core where
 
 import Control.Monad
@@ -5,10 +9,60 @@ import Control.Monad
 import Test.QuickCheck (Arbitrary)
 import qualified Test.QuickCheck as QC
 
+import Text.Printf
+import Numeric.Natural
+import Numeric.Algebra
+import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
+import qualified Prelude
 
-type R = Double ; 
+newtype R = R Double 
+    deriving (Num, Eq, Show, Ord, Fractional, 
+              Arbitrary, RealFrac, PrintfArg, Real, Floating)
 epsilon :: R
-epsilon = 1e-6 -- fast and approximate 
+epsilon = R 1e-6 -- fast and approximate 
+
+instance Order R where
+    order a b = Just (compare a b)
+    
+instance Additive R where
+  (+) = (Prelude.+)
+  --sinnum1p n r = (1 Prelude.+ toNatural n) * r
+
+instance Abelian R
+
+instance Division R where
+  recip = Prelude.recip
+  (/) = (Prelude./)
+  (\\) = undefined -- not sure what this is supposed to be
+  (^) = (Prelude.^^)
+
+pow1pIntegral :: (Division r, Integral n) => r -> n -> r
+pow1pIntegral r n = r ^ (1 Prelude.+ n)
+instance Multiplicative R where
+  (*) = (Prelude.*)
+  pow1p = pow1pIntegral
+
+instance Semiring R
+
+instance LeftModule  Natural R where (.*)   = (*) . fromIntegral
+instance LeftModule  Integer R where (.*)   = (*) . fromIntegral
+instance RightModule Natural R where m *. n = m * fromIntegral n
+instance RightModule Integer R where m *. n = m * fromIntegral n
+
+instance Monoidal R where 
+  zero = 0
+  sinnum n r = fromIntegral n * r
+
+instance Group R where
+  (-) = (Prelude.-)
+  negate = Prelude.negate
+  subtract = Prelude.subtract
+  times n r = fromIntegral n * r
+
+instance Unital R where one = 1
+
+instance Rig R where fromNatural = Prelude.fromIntegral
+instance Ring R  where fromInteger = Prelude.fromInteger
 
 newtype T a = T ((a -> R) -> R)
 
@@ -26,14 +80,29 @@ instance Monad T where
 scale :: R  -> T a -> T a
 scale r (T x) = T $ (r *) . x 
 
-zero :: T a
-zero = T $ const 0
+instance Monoidal (T a) where
+    zero = T $ \_ -> 0
 
 minus :: T a -> T a
 minus (T x) = T $ negate . x 
 
 plus :: T a -> T a -> T a
 plus (T x) (T y) = T $ (\ar -> x ar + y ar)
+
+instance LeftModule  Natural (T a) where n .* m = scale (fromIntegral n) m
+instance LeftModule  Integer (T a) where n .* m = scale (fromIntegral n) m
+instance RightModule Natural (T a) where m *. n = scale (fromIntegral n) m
+instance RightModule Integer (T a) where m *. n = scale (fromIntegral n) m
+
+instance Group (T a) where
+  x - y = plus x (minus y)
+  negate = minus
+  subtract x y = plus (minus x) y
+  times n r = scale (fromIntegral n) r
+
+
+instance Additive (T v) where
+    (+)   = plus 
 
 -- Extending a map into a the Vector space is easy peasy using the Monad instance
 -- Automatically linear

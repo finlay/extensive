@@ -13,11 +13,13 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Numeric.Extensive
+                     , Numeric.Quaternion
                      , Numeric.Extensive.Core
                      , Numeric.Extensive.Inverse
                      , Numeric.Extensive.Print
   -- other-modules:       
   build-depends:       base,
+                       algebra,
                        QuickCheck,
                        mtl,
                        pretty,

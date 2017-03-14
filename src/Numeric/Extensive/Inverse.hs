@@ -1,8 +1,11 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE BangPatterns #-}
 module Numeric.Extensive.Inverse where
 
 --import Debug.Trace
+import Numeric.Algebra
+import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger, recip, (/))
+import qualified Prelude
+
 import Numeric.Extensive.Core
 
 --   \begin{align*}
@@ -20,13 +23,13 @@ force :: (Eq a, FiniteSet a, Eq b, FiniteSet b)
 force = apply . hom
 
 inverse
-  :: (Show a, Eq a, Eq b, Ord a, 
+  :: (Show a, Eq a, Eq b, Order a, 
       FiniteSet a, FiniteSet b, Show (T a -> T a)) 
   => (T a -> T b) -> T b -> T a
 inverse = inversePre
 
 inversePre 
-  :: (Show a, Eq a, Eq b, Ord a, 
+  :: (Show a, Eq a, Eq b, Order a, 
       FiniteSet a, FiniteSet b, Show (T a -> T a)) 
   => (T a -> T b) -> T b -> T a
 inversePre a
@@ -37,7 +40,7 @@ inversePre a
     in  force $ r . invDiagonal d . transpose r . at
 
 inversePost
-  :: (Show b, Eq a, Eq b, Ord b, 
+  :: (Show b, Eq a, Eq b, Order b, 
       FiniteSet a, FiniteSet b, Show (T b -> T b)) 
   => (T a -> T b) -> T b -> T a
 inversePost a
@@ -65,7 +68,7 @@ isZero :: R -> Bool
 isZero r = abs r < 1e-8
 
 loop
-  :: (Show a, Eq a, Ord a, FiniteSet a, Show (T a -> T a)) 
+  :: (Show a, Eq a, Order a, FiniteSet a, Show (T a -> T a)) 
   => LoopState a -> (End a, End a)
 loop (LS d r []) = (d,r)
 loop (LS d r (diag@(x,y):diags))
@@ -110,7 +113,7 @@ makeRotation2
   :: (Eq a, FiniteSet a) 
   => R -> a -> a -> End a
 makeRotation2 t x y
-  | t < -1    =  extend (r (-t)       (-1))
+  | t < (-1)  =  extend (r (-t)       (-1))
   | t > 1     =  extend (r   t          1 )
   | otherwise =  extend (r   1   (recip t))
   where
