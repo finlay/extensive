@@ -23,29 +23,29 @@ force :: (Eq a, FiniteSet a, Eq b, FiniteSet b)
 force = apply . hom
 
 inverse
-  :: (Show a, Eq a, Eq b, Order a, 
+  :: (Show a, Eq a, Eq b, Ord a, 
       FiniteSet a, FiniteSet b, Show (T a -> T a)) 
   => (T a -> T b) -> T b -> T a
 inverse = inversePre
 
 inversePre 
-  :: (Show a, Eq a, Eq b, Order a, 
+  :: (Show a, Eq a, Eq b, Ord a, 
       FiniteSet a, FiniteSet b, Show (T a -> T a)) 
   => (T a -> T b) -> T b -> T a
 inversePre a
   = let at = transpose a
-        diags = [ (x,y) | x <- elements , y <- elements , x < y ]
+        diags = [ (x,y) | x <- elements , y <- elements , x Prelude.< y ]
         ls = LS (force $ at . a) id diags
         (d,r) = loop ls
     in  force $ r . invDiagonal d . transpose r . at
 
 inversePost
-  :: (Show b, Eq a, Eq b, Order b, 
+  :: (Show b, Eq a, Eq b, Ord b, 
       FiniteSet a, FiniteSet b, Show (T b -> T b)) 
   => (T a -> T b) -> T b -> T a
 inversePost a
   = let at = transpose a
-        diags = [ (x,y) | x <- elements , y <- elements , x < y ]
+        diags = [ (x,y) | x <- elements , y <- elements , x Prelude.< y ]
         ls = LS (force $ a . at) id diags
         (d,r) = loop ls
     in  force $ at . r . invDiagonal d . transpose r
@@ -68,7 +68,7 @@ isZero :: R -> Bool
 isZero r = abs r < 1e-8
 
 loop
-  :: (Show a, Eq a, Order a, FiniteSet a, Show (T a -> T a)) 
+  :: (Show a, Eq a, Ord a, FiniteSet a, Show (T a -> T a)) 
   => LoopState a -> (End a, End a)
 loop (LS d r []) = (d,r)
 loop (LS d r (diag@(x,y):diags))
@@ -77,8 +77,8 @@ loop (LS d r (diag@(x,y):diags))
        then loop (LS d r diags) 
        else let rot = makeRotation d diag
                 d'  = transpose rot . d . rot
-                newdiags = [ (x ,y') | y' <- elements, y /= y', x  < y']
-                        ++ [ (x',y ) | x' <- elements, x /= x', x' < y ]
+                newdiags = [ (x ,y') | y' <- elements, y /= y', x  Prelude.< y']
+                        ++ [ (x',y ) | x' <- elements, x /= x', x' Prelude.< y ]
                 diags' = diags ++ [ d | d <- newdiags, not (elem d diags)]
             in  loop (LS (force d') (force $ r . rot) diags')
 

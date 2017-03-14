@@ -87,28 +87,8 @@ injectTau = extend injectTau'
                                   y' = return ye
                               in  scale 0.5 (x' `tensor` y' - y' `tensor` x')
 
-injectTauInv' :: T (Tensor H H) -> T Tau
-injectTauInv' = extend injectTauInv'
-  where
-    injectTauInv' (E `Tensor` E) = return (Sym E E) 
-    injectTauInv' (I `Tensor` I) = return (Sym I I)
-    injectTauInv' (J `Tensor` J) = return (Sym J J)
-    injectTauInv' (K `Tensor` K) = return (Sym K K)
-    injectTauInv' (E `Tensor` I) = (return (Sym E I)) + (return (Skew E I))
-    injectTauInv' (I `Tensor` E) = (return (Sym E I)) - (return (Skew E I))
-    injectTauInv' (E `Tensor` J) = (return (Sym E J)) + (return (Skew E J))
-    injectTauInv' (J `Tensor` E) = (return (Sym E J)) - (return (Skew E J))
-    injectTauInv' (E `Tensor` K) = (return (Sym E K)) + (return (Skew E K))
-    injectTauInv' (K `Tensor` E) = (return (Sym E K)) - (return (Skew E K))
-    injectTauInv' (I `Tensor` J) = (return (Sym I J)) + (return (Skew I J))
-    injectTauInv' (J `Tensor` I) = (return (Sym I J)) - (return (Skew I J))
-    injectTauInv' (J `Tensor` K) = (return (Sym J K)) + (return (Skew J K))
-    injectTauInv' (K `Tensor` J) = (return (Sym J K)) - (return (Skew J K))
-    injectTauInv' (K `Tensor` I) = (return (Sym K I)) + (return (Skew K I))
-    injectTauInv' (I `Tensor` K) = (return (Sym K I)) - (return (Skew K I))
-
 injectTauInv :: T (Tensor H H) -> T Tau
-injectTauInv = inverse injectTau
+injectTauInv = force $ inverse injectTau
 
 -- Killing form
 killing :: (Multiplicative (T a), FiniteSet a, Eq a) => T a -> T a -> R
