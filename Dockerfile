@@ -8,3 +8,8 @@ COPY Setup.hs Setup.hs
 
 RUN stack build --only-dependencies
 
+RUN apt-get update \ 
+	&& apt-get install -y --no-install-recommends \
+		make \
+	&& rm -rf /var/lib/apt/lists/*
+
