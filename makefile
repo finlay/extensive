@@ -2,13 +2,15 @@ IMAGE := docker.dragonfly.co.nz/finlay/extensive
 
 SRC := $(shell find src -name "*.hs")
 HASDOCKER ?= $(shell which docker-engine || which docker)
-RUN := $(if $(HASDOCKER), docker run --net host --rm -u $$(id -u):$$(id -g) -e STACK_ROOT=/work -v $$PWD:/work -w /work $(IMAGE),) 
+RUN := $(if $(HASDOCKER), docker run --net host --rm -v $$PWD:/work -w /work $(IMAGE),) 
 
-inverse.html: inverse
-	./$< --output $@
+all: inverse.csv
 
-inverse: inverse.hs $(SRC)
-	$(RUN) bash -c 'stack --local-bin-path . install'
+inverse.csv: inverse
+	./$< --csv $@
+
+inverse: inverse.hs $(SRC) extensive.cabal
+	$(RUN) bash -c 'stack --allow-different-user --local-bin-path . install'
 
 docker:
 	docker build -t $(IMAGE) .

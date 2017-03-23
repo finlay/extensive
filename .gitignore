@@ -4,4 +4,7 @@
 *.aux
 *.log
 *.pdf
+*.csv
+*.html
+inverse
 .stack-work
