@@ -4,6 +4,7 @@
 
 import System.Random
 import qualified Test.QuickCheck as QC
+import Criterion.Main
 
 import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import qualified Prelude
@@ -39,29 +40,19 @@ data C = C Int deriving (Eq, Ord)
 instance FiniteSet C where elements = [ C i | i <- [1 .. 3] ]
 instance Show C where show (C i) = "C_"++show i 
 
-run :: Double -> IO ()
-run p = do 
-    
-    -- Generate random three by three linear transformation
-    --(a :: T C -> T C)  <- randomMatrix p
-    --(a :: T (Tensor C C) -> T (Tensor C C))  <- randomMatrix p
-    --(a :: T (Tensor H H) -> T (Tensor H H))  <- randomMatrix p
-    (a :: T H -> T H)  <- randomMatrix p
-    putStrLn "A = "
-    printMap a
-    
-    let ainv = inverse a
-
-    putStrLn "A^{-1} = "
-    printMap ainv
-
-    putStrLn "Check..."
-    print (ainv . a)
-
-    putStrLn "Done"
- 
-
 main :: IO()
-main = run 0.5
-
+main = do
+    (a5 :: T H -> T H)  <- randomMatrix 0.5
+    (a4 :: T H -> T H)  <- randomMatrix 0.4
+    (a3 :: T H -> T H)  <- randomMatrix 0.3
+    (a2 :: T H -> T H)  <- randomMatrix 0.2
+    (a1 :: T H -> T H)  <- randomMatrix 0.1
+    let test = show . inverse
+    defaultMain 
+        [ bgroup "4"
+            [ bench "0.5" $ nf test a5
+            , bench "0.4" $ nf test a4
+            , bench "0.3" $ nf test a3
+            , bench "0.2" $ nf test a2
+            , bench "0.1" $ nf test a1 ] ] 
 

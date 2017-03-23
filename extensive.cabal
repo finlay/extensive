@@ -31,10 +31,11 @@ library
 
 executable inverse
   main-is:             inverse.hs
-  build-depends:       extensive,
+  build-depends:       base,
+                       criterion,
+                       extensive,
                        QuickCheck,
-                       random,
-                       base
+                       random
   ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded
   default-language:    Haskell2010
                        
