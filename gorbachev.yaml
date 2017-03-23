@@ -1,1 +1,1 @@
-docker: haskell:7.10.3
+docker: docker.dragonfly.co.nz/finlay/extensive:v1

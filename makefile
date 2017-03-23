@@ -1,4 +1,4 @@
-IMAGE := docker.dragonfly.co.nz/finlay/extensive
+IMAGE := docker.dragonfly.co.nz/finlay/extensive:v1
 
 SRC := $(shell find src -name "*.hs")
 HASDOCKER ?= $(shell which docker-engine || which docker)
@@ -14,3 +14,5 @@ inverse: inverse.hs $(SRC) extensive.cabal
 
 docker:
 	docker build -t $(IMAGE) .
+docker-push:
+	docker push $(IMAGE) 
