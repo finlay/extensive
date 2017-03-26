@@ -40,3 +40,14 @@ executable inverse
   default-language:    Haskell2010
                        
 
+executable centre-exe
+  main-is:             centre.hs
+  build-depends:       base,
+                       criterion,
+                       extensive,
+                       QuickCheck,
+                       random
+  ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded
+  default-language:    Haskell2010
+                       
+

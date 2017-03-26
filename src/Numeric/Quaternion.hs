@@ -132,7 +132,20 @@ instance Multiplicative (T SO3) where
 so3 :: T SO3 -> T (Tau)
 so3 = extend so3'
   where 
-    so3' X = return $ Skew E I
-    so3' Y = return $ Skew E J
-    so3' Z = return $ Skew E K
+    so3' X = scale (-1) $ return $ Skew E I
+    so3' Y = scale (-1) $ return $ Skew E J
+    so3' Z = scale (-1) $ return $ Skew E K
+
+
+-- Check if a function is a homomorphism
+isHomomorphism 
+    :: ( FiniteSet a, FiniteSet b, Eq b)
+    => (T a -> T a -> T a) 
+    -> (T b -> T b -> T b) 
+    -> (T a -> T b) -> [(T a,T a)] 
+isHomomorphism m1 m2 l
+  = [ (x1,y1) | x1 <- basis
+              , y1 <- basis
+              , (l x1) `m2` (l y1) /= l (x1 `m1` y1) ]
+
 

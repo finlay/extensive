@@ -16,10 +16,13 @@ import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import qualified Prelude
 
 newtype R = R Double 
-    deriving (Num, Eq, Show, Ord, Fractional, 
+    deriving (Num, Eq, Ord, Fractional, 
               Arbitrary, RealFrac, PrintfArg, Real, Floating)
 epsilon :: R
 epsilon = R 1e-6 -- fast and approximate 
+
+instance Show R where
+    show (R n) = show n
 
 instance Order R where
     order a b = Just (compare a b)
@@ -155,6 +158,9 @@ em (Hom x y) (T vx) =
 mmul :: (Eq a, FiniteSet a, Eq c, FiniteSet c) 
      => (T b -> T c) -> (T a -> T b) -> (T a -> T c)
 mmul a b =  {-# SCC "mmul" #-} apply . hom $ (a . b)
+
+basis :: (FiniteSet a, Monad m) => [ m a ]
+basis = map return elements
 
 -- Finite sets can be listed, which is elements
 class FiniteSet x where elements :: [ x ]

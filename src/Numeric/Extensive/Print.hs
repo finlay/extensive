@@ -10,7 +10,7 @@ import Numeric.Extensive.Core
 showInBasis :: (Show b, Eq b) => [b] -> T b -> String
 showInBasis bs v =
         let coef (T v') = v' . delta
-            pairs = map (\e -> (e, coef v e)) bs
+            pairs = [ (e, coef v e) | e <- bs ]
             showPair (b, n) 
                | n == " + 1" = " + "  ++ show b
                | n == " - 1" = " - "  ++ show b

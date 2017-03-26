@@ -12,6 +12,9 @@ inverse.csv: inverse
 inverse: inverse.hs $(SRC) extensive.cabal
 	$(RUN) bash -c 'stack --allow-different-user --local-bin-path . install'
 
+centre-exe: centre.hs $(SRC) extensive.cabal
+	$(RUN) bash -c 'stack --allow-different-user --local-bin-path . install'
+
 interact:
 	docker run -it --net host --rm -v $$PWD:/work -w /work $(IMAGE) bash
 docker:
