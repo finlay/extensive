@@ -2,9 +2,13 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE KindSignatures #-}
 module Numeric.Extensive.Core where
 
 import Control.Monad
+import GHC.TypeLits
+import Data.Proxy
 
 import Test.QuickCheck (Arbitrary)
 import qualified Test.QuickCheck as QC
@@ -176,6 +180,16 @@ instance (Show x, Show y) => Show (Tensor x y) where
 
 instance (Show x, Show y) => Show (Hom x y) where
     show (Hom x y) = show x ++ " \x21A6 " ++ show y
+
+-- Standard data type, parametrised by data kind int
+newtype N (n::Nat) = N Integer
+    deriving (Eq, Ord)
+
+instance KnownNat n => FiniteSet (N n) where
+    elements = let dim = natVal (undefined :: Proxy n)
+               in  [ N i | i <- [ 1 .. dim ] ]
+instance Show (N n) where
+    show (N i) = "n_"++show i
 
 -- If we have a vector over a finite set, we can calculate the coefficients
 coefficients :: (FiniteSet x, Eq x) => T x -> [(x, R)]
