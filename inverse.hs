@@ -10,6 +10,7 @@ import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import qualified Prelude
 
 import Numeric.Extensive
+import Numeric.Quaternion
 
 -- Make a random matrix
 randomElement :: (FiniteSet a) => Double -> IO (T a)
@@ -32,9 +33,6 @@ randomMatrix
     => Double -> IO (T a -> T b)
 randomMatrix p = apply <$> randomElement p
 
-data H = E | I | J | K deriving (Eq, Ord, Show)
-instance Order H where order a b = Just (compare a b)
-instance FiniteSet H where elements = [ E, I, J, K ]
 
 data C = C Int deriving (Eq, Ord)
 instance FiniteSet C where elements = [ C i | i <- [1 .. 3] ]
