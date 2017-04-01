@@ -7,7 +7,7 @@ import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import Numeric.Extensive
 import Numeric.Quaternion
 
---  l . kernel l == zero
+--  hom $ l . kernel l == zero
 kernel :: (T a -> T b) -> T (N n) -> T a
 kernel _l = undefined
 
