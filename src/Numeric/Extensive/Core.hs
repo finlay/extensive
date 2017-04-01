@@ -1,4 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -186,7 +187,7 @@ newtype N (n::Nat) = N Integer
     deriving (Eq, Ord)
 
 instance KnownNat n => FiniteSet (N n) where
-    elements = let dim = natVal (undefined :: Proxy n)
+    elements = let dim = natVal (Proxy :: Proxy n)
                in  [ N i | i <- [ 1 .. dim ] ]
 instance Show (N n) where
     show (N i) = "n_"++show i
