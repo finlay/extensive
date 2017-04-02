@@ -10,6 +10,7 @@ all: inverse.csv
 
 inverse.csv: inverse
 	./$< --csv $@
+	mkdir -p timings
 	mv $@ timings/$(DATE)-$@
 	Rscript plot.r timings/$(DATE)-$@	
 
