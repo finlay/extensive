@@ -6,13 +6,15 @@ RUN := $(if $(HASDOCKER), docker run --net host --rm -v $$PWD:/work -w /work $(I
 
 DATE := $(shell date +"%Y-%m-%d")
 
-all: inverse.csv
+all: timings/$(DATE)-inverse.csv timings/$(DATE)-inverse.pdf
 
-inverse.csv: inverse
-	./$< --csv $@
+%.csv: inverse
 	mkdir -p timings
-	cp $@ timings/$(DATE)-$@
-	Rscript plot.r timings/$(DATE)-$@	
+	rm -f $@
+	./$< --csv $@
+
+%.pdf: %.csv plot.r
+	Rscript plot.r $<
 
 inverse: inverse.hs $(SRC) extensive.cabal
 	$(RUN) bash -c 'stack --allow-different-user --local-bin-path . install'

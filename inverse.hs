@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds #-}
 
 import System.Random
 import qualified Test.QuickCheck as QC
@@ -10,7 +11,6 @@ import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import qualified Prelude
 
 import Numeric.Extensive
-import Numeric.Quaternion
 
 -- Make a random matrix
 randomElement :: (FiniteSet a) => Double -> IO (T a)
@@ -33,21 +33,15 @@ randomMatrix
     => Double -> IO (T a -> T b)
 randomMatrix p = apply <$> randomElement p
 
-
-data C = C Int deriving (Eq, Ord)
-instance FiniteSet C where elements = [ C i | i <- [1 .. 3] ]
-instance Show C where show (C i) = "C_"++show i 
-
 runTest :: Double -> IO String
 runTest p = do
-    a :: T H -> T H <- randomMatrix p
+    a :: T (N 5) -> T (N 5) <- randomMatrix p
     return $ show $ inverse a
     
-
 main :: IO()
-main = do
-    defaultMain 
-        [ bgroup "4"
-            [ bench (show p) $ nfIO $ runTest p
-            | p <- [0.0,0.1 .. 1.0 ] ] ]
+main 
+  = defaultMain 
+    [ bgroup "4"
+      [ bench (show p) $ nfIO $ runTest p
+      | p <- [0.0,0.1 .. 1.0 ] ] ]
 
