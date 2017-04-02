@@ -11,7 +11,7 @@ all: inverse.csv
 inverse.csv: inverse
 	./$< --csv $@
 	mkdir -p timings
-	mv $@ timings/$(DATE)-$@
+	cp $@ timings/$(DATE)-$@
 	Rscript plot.r timings/$(DATE)-$@	
 
 inverse: inverse.hs $(SRC) extensive.cabal
