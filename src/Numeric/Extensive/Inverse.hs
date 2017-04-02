@@ -2,6 +2,7 @@
 module Numeric.Extensive.Inverse where
 
 --import Debug.Trace
+import Data.List (elemIndex)
 import Numeric.Algebra
 import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger, recip, (/))
 import qualified Prelude
@@ -23,14 +24,12 @@ force :: (Eq a, FiniteSet a, Eq b, FiniteSet b)
 force = apply . hom
 
 inverse
-  :: (Show a, Eq a, Eq b, Ord a, 
-      FiniteSet a, FiniteSet b, Show (T a -> T a)) 
+  :: (Eq a, Eq b, Ord a, FiniteSet a, FiniteSet b) 
   => (T a -> T b) -> T b -> T a
 inverse = inversePre
 
 inversePre 
-  :: (Show a, Eq a, Eq b, Ord a, 
-      FiniteSet a, FiniteSet b, Show (T a -> T a)) 
+  :: (Eq a, Eq b, Ord a, FiniteSet a, FiniteSet b) 
   => (T a -> T b) -> T b -> T a
 inversePre a
   = let at = transpose a
@@ -39,36 +38,44 @@ inversePre a
         (d,r) = loop ls
     in  force $ r . invDiagonal d . transpose r . at
 
-inversePost
-  :: (Show b, Eq a, Eq b, Ord b, 
-      FiniteSet a, FiniteSet b, Show (T b -> T b)) 
-  => (T a -> T b) -> T b -> T a
+--inversePost
+--  :: (Eq a, Eq b, Ord b, FiniteSet a, FiniteSet b) 
+--  => (T a -> T b) -> (T b -> T a, End b, T a -> T b, End a)
 inversePost a
   = let at = transpose a
         diags = [ (x,y) | x <- elements , y <- elements , x Prelude.< y ]
         ls = LS (force $ a . at) id diags
         (d,r) = loop ls
-    in  force $ at . r . invDiagonal d . transpose r
+        sqrtd = sqrtDiagonal d
+        s = force $ invDiagonal sqrtd . transpose r . a
+        inva = force $ at . r . invDiagonal d . transpose r
+    in  (inva, r, sqrtd, s)
 
 
-invDiagonal :: (Eq a) => End a -> End a
+invDiagonal 
+    :: (Eq a, Eq b, FiniteSet a, FiniteSet b) 
+    => (T a -> T b) -> (T b -> T a)
 invDiagonal l
-  = let coef x = let T v = l (return x) in v (delta x)
-        base x = if isZero (coef x)
-                    then zero
-                    else scale (recip $ coef x) (return x)
-    in  extend base
+  = let T homl = hom l
+    in  transpose (apply (T (recip . homl)))
+
+sqrtDiagonal
+    :: (Eq a, Eq b, FiniteSet a, FiniteSet b) 
+    => (T a -> T b) -> T a -> T b
+sqrtDiagonal l
+  = let T homl = hom l
+    in  apply (T (sqrt . homl))
 
 data LoopState a
   = LS (End a)      -- transpose $ D := A^TA  $
        (End a)      -- rotation  $ R := Id    $
-       [(a,a)]      -- diagonals that need checking
+       ! [(a,a)]      -- diagonals that need checking
 
 isZero :: R -> Bool
 isZero r = abs r < 1e-8
 
 loop
-  :: (Show a, Eq a, Ord a, FiniteSet a, Show (T a -> T a)) 
+  :: (Eq a, Ord a, FiniteSet a) 
   => LoopState a -> (End a, End a)
 loop (LS d r []) = (d,r)
 loop (LS d r (diag@(x,y):diags))

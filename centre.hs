@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 -- How to calculate the center of a Lie Algebra.
 
 -- Borrowing ideas from deGraaf

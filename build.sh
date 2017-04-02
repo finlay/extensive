@@ -4,3 +4,4 @@
 make
 
 cp inverse.csv /output/
+cp timings/* /output/
