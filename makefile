@@ -1,4 +1,4 @@
-IMAGE := docker.dragonfly.co.nz/finlay/extensive:v2
+IMAGE := docker.dragonfly.co.nz/finlay/extensive:v3
 
 SRC := $(shell find src -name "*.hs")
 HASDOCKER ?= $(shell which docker-engine || which docker)
