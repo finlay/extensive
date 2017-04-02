@@ -1,7 +1,7 @@
 #!/bin/bash
 
+set -ex
 
 make
 
-cp inverse.csv /output/
 cp timings/* /output/
