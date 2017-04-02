@@ -38,19 +38,16 @@ data C = C Int deriving (Eq, Ord)
 instance FiniteSet C where elements = [ C i | i <- [1 .. 3] ]
 instance Show C where show (C i) = "C_"++show i 
 
+runTest :: Double -> IO String
+runTest p = do
+    a :: T H -> T H <- randomMatrix p
+    return $ show $ inverse a
+    
+
 main :: IO()
 main = do
-    (a5 :: T H -> T H)  <- randomMatrix 0.5
-    (a4 :: T H -> T H)  <- randomMatrix 0.4
-    (a3 :: T H -> T H)  <- randomMatrix 0.3
-    (a2 :: T H -> T H)  <- randomMatrix 0.2
-    (a1 :: T H -> T H)  <- randomMatrix 0.1
-    let test = show . inverse
     defaultMain 
         [ bgroup "4"
-            [ bench "0.5" $ nf test a5
-            , bench "0.4" $ nf test a4
-            , bench "0.3" $ nf test a3
-            , bench "0.2" $ nf test a2
-            , bench "0.1" $ nf test a1 ] ] 
+            [ bench (show p) $ nfIO $ runTest p
+            | p <- [0.0,0.1 .. 1.0 ] ] ]
 
