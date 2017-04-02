@@ -13,9 +13,7 @@ ggplot(data=d, aes(x=Name, group=1)) +
         ymin=(Mean-1.96*Stddev)*1000,
         ymax=(Mean+1.96*Stddev)*1000),
         alpha=0.3)+
-    scale_x_continuous(
-        breaks=seq(0.0,1.0,0.1),
-        labels=seq(0.0,1.0,0.1)) +
+    scale_x_discrete(labels=seq(0.0,1.0,0.1)) +
     xlab('Probability of non-zero elements, p') +
     ylab('Mean, micro seconds')
 dev.off()
