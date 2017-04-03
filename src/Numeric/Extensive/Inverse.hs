@@ -47,17 +47,24 @@ inversePost a
         ls = LS (force $ a . at) id diags
         (d,r) = loop ls
         sqrtd = sqrtDiagonal d
-        s = force $ invDiagonal sqrtd . transpose r . a
-        inva = force $ at . r . invDiagonal d . transpose r
+        s = force $ invDiagonal2 sqrtd . transpose r . a
+        inva = force $ at . r . invDiagonal2 d . transpose r
     in  (inva, r, sqrtd, s)
 
 
-invDiagonal 
-    :: (Eq a, Eq b, FiniteSet a, FiniteSet b) 
-    => (T a -> T b) -> (T b -> T a)
-invDiagonal l
+invDiagonal2 
+    :: (Eq a, FiniteSet a) 
+    => (T a -> T a) -> (T a -> T a)
+invDiagonal2 l
   = let T homl = hom l
-    in  transpose (apply (T (recip . homl)))
+    in  apply (T (recip . homl))
+invDiagonal :: (Eq a) => End a -> End a
+invDiagonal l
+  = let coef x = let T v = l (return x) in v (delta x)
+        base x = if isZero (coef x)
+                    then zero
+                    else scale (recip $ coef x) (return x)
+    in  extend base
 
 sqrtDiagonal
     :: (Eq a, Eq b, FiniteSet a, FiniteSet b) 

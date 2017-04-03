@@ -2,7 +2,10 @@
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE KindSignatures #-}
 
+import GHC.TypeLits
+import Data.Proxy
 import System.Random
 import qualified Test.QuickCheck as QC
 import Criterion.Main
@@ -33,15 +36,18 @@ randomMatrix
     => Double -> IO (T a -> T b)
 randomMatrix p = apply <$> randomElement p
 
-runTest :: Double -> IO String
-runTest p = do
-    a :: T (N 5) -> T (N 5) <- randomMatrix p
-    return $ show $ inverse a
+runTest :: Integer -> Double -> IO String
+runTest i p = do
+    case someNatVal i of
+        Just (SomeNat (_ :: Proxy n)) -> do
+            a :: T (N n) -> T (N n) <- randomMatrix p
+            return $ show  a
     
 main :: IO()
 main 
   = defaultMain 
-    [ bgroup "4"
-      [ bench (show p) $ nfIO $ runTest p
-      | p <- [0.0,0.1 .. 1.0 ] ] ]
+    [ bgroup (show n)
+      [ bench (show p) $ nfIO $ runTest n p
+      | p <- [0.0,0.1 .. 1.0 ] ] 
+    | n <- [ 1 .. 10 ] ]
 
