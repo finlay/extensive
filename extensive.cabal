@@ -50,4 +50,14 @@ executable centre-exe
   ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded
   default-language:    Haskell2010
                        
+executable symmetric-exe
+  main-is:             symmetric.hs
+  build-depends:       base,
+                       criterion,
+                       extensive,
+                       QuickCheck,
+                       random
+  ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded
+  default-language:    Haskell2010
+                       
 
