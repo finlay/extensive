@@ -2,7 +2,6 @@
 module Numeric.Extensive.Inverse where
 
 --import Debug.Trace
-import Data.List (elemIndex)
 import Numeric.Algebra
 import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger, recip, (/))
 import qualified Prelude
@@ -106,7 +105,7 @@ makeRotation m (x, y) =
 
 angle :: R -> R
 angle ct = 
-    let sgn a = a / abs a
+    let sgn a = if a >= 0.0 then 1 else -1
     in atan $ (sgn ct) / ((abs ct) + (sqrt (1 + ct*ct)))
 
 rot
