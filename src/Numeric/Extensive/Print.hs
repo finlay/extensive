@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
 module Numeric.Extensive.Print where
 
 import Text.PrettyPrint.Boxes

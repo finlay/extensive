@@ -7,6 +7,7 @@ import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger, r
 import qualified Prelude
 
 import Numeric.Extensive.Core
+import Numeric.Extensive.Print()
 
 --   \begin{align*}
 --         D     &= R^T(A^TA)R              \\
@@ -23,33 +24,42 @@ force :: (Eq a, FiniteSet a, Eq b, FiniteSet b)
 force = apply . hom
 
 inverse
-  :: (Eq a, Eq b, Ord a, FiniteSet a, FiniteSet b) 
+  :: (Eq a, Eq b, Ord a, FiniteSet a, FiniteSet b, Show a) 
   => (T a -> T b) -> T b -> T a
 inverse x = let (invx, _,_) = inversePre x  in invx
 
 inversePre 
-  :: (Eq a, Eq b, Ord a, FiniteSet a, FiniteSet b) 
+  :: (Eq a, Eq b, Ord a, FiniteSet a, FiniteSet b, Show a) 
   => (T a -> T b) -> (T b -> T a, T a -> T a, T a -> T a)
 inversePre a
   = let at = transpose a
         diags = [ (x,y) | x <- elements , y <- elements , x Prelude.< y ]
         ls = LS (force $ at . a) id diags
         (d,r) = loop ls
-        inv = force $ r . invDiagonal d . transpose r . at
-    in (inv, r, d)
+        inva = force $ r . invDiagonal d . transpose r . at
+    in  (inva, r, d)
 
---inversePost
---  :: (Eq a, Eq b, Ord b, FiniteSet a, FiniteSet b) 
---  => (T a -> T b) -> (T b -> T a, End b, T a -> T b, End a)
+inversePost
+  :: (Eq a, Eq b, Ord b, FiniteSet a, FiniteSet b, Show b) 
+  => (T a -> T b) -> T b -> T a
 inversePost a
   = let at = transpose a
         diags = [ (x,y) | x <- elements , y <- elements , x Prelude.< y ]
         ls = LS (force $ a . at) id diags
         (d,r) = loop ls
-        sqrtd = sqrtDiagonal d
-        s = force $ invDiagonal2 sqrtd . transpose r . a
-        inva = force $ at . r . invDiagonal2 d . transpose r
-    in  (inva, r, sqrtd, s)
+    in  force $ at . r . invDiagonal d . transpose r
+-- inversePost
+--   :: (Eq a, Eq b, Ord b, FiniteSet a, FiniteSet b) 
+--   => (T a -> T b) -> (T b -> T a, End b, T a -> T b, End a)
+-- inversePost a
+--   = let at = transpose a
+--         diags = [ (x,y) | x <- elements , y <- elements , x Prelude.< y ]
+--         ls = LS (force $ a . at) id diags
+--         (d,r) = loop ls
+--         sqrtd = sqrtDiagonal d
+--         s = force $ invDiagonal2 sqrtd . transpose r . a
+--         inva = force $ at . r . invDiagonal2 d . transpose r
+--     in  (inva, r, sqrtd, s)
 
 
 invDiagonal2 
@@ -82,7 +92,7 @@ isZero :: R -> Bool
 isZero r = abs r < 1e-8
 
 loop
-  :: (Eq a, Ord a, FiniteSet a) 
+  :: (Eq a, Ord a, FiniteSet a, Show a) 
   => LoopState a -> (End a, End a)
 loop (LS d r []) = (d,r)
 loop (LS d r (diag@(x,y):diags))
@@ -91,8 +101,12 @@ loop (LS d r (diag@(x,y):diags))
        then loop (LS d r diags) 
        else let rot = makeRotation d diag
                 d'  = transpose rot . d . rot
-                newdiags = [ (x ,y') | y' <- elements, y /= y', x  Prelude.< y']
-                        ++ [ (x',y ) | x' <- elements, x /= x', x' Prelude.< y ]
+                newdiags = [ (x ,y') | y' <- elements
+                                     , y /= y'
+                                     , x  Prelude.< y']
+                        ++ [ (x',y ) | x' <- elements
+                                     , x /= x'
+                                     , x' Prelude.< y ]
                 diags' = diags ++ [ d | d <- newdiags, not (elem d diags)]
             in  loop (LS (force d') (force $ r . rot) diags')
 
@@ -106,7 +120,7 @@ makeRotation m (x, y) =
 
 angle :: R -> R
 angle ct = 
-    let sgn a = if a >= 0.0 then 1 else -1
+    let sgn a = if a >= 0.0 then 1.0 else -1.0
     in atan $ (sgn ct) / ((abs ct) + (sqrt (1 + ct*ct)))
 
 rot

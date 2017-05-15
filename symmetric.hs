@@ -5,7 +5,11 @@
 
 import Numeric.Algebra hiding (zero)
 import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
+import System.Random
+import qualified Test.QuickCheck as QC
+import qualified Prelude
 import Numeric.Extensive
+import Text.PrettyPrint.Boxes
 
 
 data Sym3 
@@ -68,10 +72,56 @@ t,τ :: T Sym3
 τ = return Tau
 t = τ
 
+bss :: [ T Sym3 ]
+bss = [ return x | x <- elements ]
 
-res :: [ (T Sym3, T Sym3) ]
-res = [ (return x, return y)
-      | x <- elements, y <- elements ] 
+e1,f1,g1 :: T Sym3
+e1 = scale (1.0 Prelude./ 6) ((o + t) * (o + s + s * s))
+f1 = scale (1.0 Prelude./ 6) ((o - t) * (o + s + s * s))
+g1 = scale (1.0 Prelude./ 3) ((scale 2 o) - s - s * s)
+
+inbasis :: Box
+inbasis = 
+  let row = vsep 2 right
+      header = row (text "": [ text (show x) | x <- bss ])
+      rest = [ row ( text (show x) 
+                   : [ text  (show (x * y)) | y <- bss ] ) 
+             | x <- bss ]
+  in  hsep 4 bottom ( header : rest )
+
+
+proj  :: T Sym3 ->  [ T Sym3 ] ->  Box
+proj pr bss = 
+  let col = vsep 2 right
+      xs = col [text (show x) | x <- bss ]
+      e1xs = col [text (show (pr * x)) | x <- bss ]
+  in  hsep 4 bottom [ xs, e1xs ]
+
+
+
+
+-- Make a random matrix
+randomElement :: (FiniteSet a) => Double -> IO (T a)
+randomElement p 
+  = foldl1 plus <$> (mapM sce =<< els)
+  where
+      bernoulli :: (Num a, Ord a, Random a) => a -> IO Bool
+      bernoulli p = (Prelude.> p) <$> randomRIO (0, 1)
+      choose :: Double -> a -> a -> IO a
+      choose p a b =
+          do r <- bernoulli p
+             return $ if r then a else b
+      els :: FiniteSet a => IO [T a]
+      els = mapM (choose p zero . return) elements
+      sce :: T a -> IO (T a)
+      sce b = fmap (\x -> scale x b) (QC.generate QC.arbitrary )
+
+randomMatrix 
+    :: (FiniteSet a, Eq a, FiniteSet b, Eq b) 
+    => Double -> IO (T a -> T b)
+randomMatrix p = apply <$> randomElement p
+
+
 
 e1,f1,g1 :: T Sym3
 e1 = scale (1.0 Prelude./6) $ ( o + t) * ( o + s + s*s )
