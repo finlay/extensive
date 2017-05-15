@@ -2,7 +2,6 @@
 module Numeric.Extensive.Inverse where
 
 --import Debug.Trace
-import Data.List (elemIndex)
 import Numeric.Algebra
 import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger, recip, (/))
 import qualified Prelude
@@ -26,17 +25,18 @@ force = apply . hom
 inverse
   :: (Eq a, Eq b, Ord a, FiniteSet a, FiniteSet b) 
   => (T a -> T b) -> T b -> T a
-inverse = inversePre
+inverse x = let (invx, _,_) = inversePre x  in invx
 
 inversePre 
   :: (Eq a, Eq b, Ord a, FiniteSet a, FiniteSet b) 
-  => (T a -> T b) -> T b -> T a
+  => (T a -> T b) -> (T b -> T a, T a -> T a, T a -> T a)
 inversePre a
   = let at = transpose a
         diags = [ (x,y) | x <- elements , y <- elements , x Prelude.< y ]
         ls = LS (force $ at . a) id diags
         (d,r) = loop ls
-    in  force $ r . invDiagonal d . transpose r . at
+        inv = force $ r . invDiagonal d . transpose r . at
+    in (inv, r, d)
 
 --inversePost
 --  :: (Eq a, Eq b, Ord b, FiniteSet a, FiniteSet b) 
@@ -106,7 +106,7 @@ makeRotation m (x, y) =
 
 angle :: R -> R
 angle ct = 
-    let sgn a = a / abs a
+    let sgn a = if a >= 0.0 then 1 else -1
     in atan $ (sgn ct) / ((abs ct) + (sqrt (1 + ct*ct)))
 
 rot

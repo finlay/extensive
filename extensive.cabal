@@ -53,6 +53,7 @@ executable centre-exe
 executable symmetric-exe
   main-is:             symmetric.hs
   build-depends:       base,
+                       algebra,
                        criterion,
                        extensive,
                        QuickCheck,
