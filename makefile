@@ -25,6 +25,9 @@ centre-exe: centre.hs $(SRC) extensive.cabal
 symmetric-exe: symmetric.hs $(SRC) extensive.cabal
 	$(RUN) bash -c 'stack --allow-different-user --local-bin-path . install'
 
+symmetric.pdf: symmetric.tex
+	xelatex $<
+
 interact:
 	docker run -it --net host --rm -v $$PWD:/work -w /work $(IMAGE) bash
 docker:
