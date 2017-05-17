@@ -13,3 +13,14 @@ RUN apt-get update \
 		make r-cran-ggplot2 \
 	&& rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update \ 
+	&& apt-get install -y --no-install-recommends \
+		texlive-base texlive-math-extra texlive-fonts-recommended \
+        texlive-latex-recommended texlive-xetex \
+	&& rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \ 
+	&& apt-get install -y --no-install-recommends \
+		texlive-fonts-extra \
+	&& rm -rf /var/lib/apt/lists/*
+
