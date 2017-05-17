@@ -123,10 +123,5 @@ randomMatrix p = apply <$> randomElement p
 
 
 
-e1,f1,g1 :: T Sym3
-e1 = scale (1.0 Prelude./6) $ ( o + t) * ( o + s + s*s )
-f1 = scale (1.0 Prelude./6) $ ( o - t) * ( o + s + s*s )
-g1 = scale (1.0 Prelude./3) $ ( scale 2 o - s - s*s )
-
 main :: IO()
 main = putStrLn "Hello!"
