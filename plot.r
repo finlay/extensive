@@ -6,7 +6,7 @@ d <- read.csv(paste0(fn))
 d$n <- gsub('(\\d)/\\d\\.\\d.*','\\1', d$Name)
 d$p <- gsub('\\d/(\\d\\.\\d).*','\\1', d$Name)
 
-d$x <- as.numeric(d$x)
+d$n <- as.numeric(d$n)
 
 pdf(width=8, height=5, 
     file=paste0(gsub('.csv', '', fn), '.pdf'))
