@@ -4,7 +4,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 
 import Numeric.Algebra hiding (zero)
-import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
+import Prelude hiding ((+), (-), (*), (^), (/), negate, (>), (<), sum, fromInteger)
 import System.Random
 import qualified Test.QuickCheck as QC
 import qualified Prelude
@@ -75,10 +75,10 @@ t = τ
 bss :: [ T Sym3 ]
 bss = [ return x | x <- elements ]
 
-e1,f1,g1 :: T Sym3
-e1 = scale (1.0 Prelude./ 6) ((o + t) * (o + s + s * s))
-f1 = scale (1.0 Prelude./ 6) ((o - t) * (o + s + s * s))
-g1 = scale (1.0 Prelude./ 3) ((scale 2 o) - s - s * s)
+pi0,pi1,pi2 :: T Sym3
+pi0 = scale (1.0 / 6) ((o + t) * (o + s + s * s))
+pi1 = scale (1.0 / 6) ((o - t) * (o + s + s * s))
+pi2 = scale (1.0 / 3) ((scale 2 o) - s - s * s)
 
 inbasis :: Box
 inbasis = 
