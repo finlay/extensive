@@ -75,10 +75,10 @@ t = τ
 bss :: [ T Sym3 ]
 bss = [ return x | x <- elements ]
 
-e1,f1,g1 :: T Sym3
-e1 = scale (1.0 Prelude./ 6) ((o + t) * (o + s + s * s))
-f1 = scale (1.0 Prelude./ 6) ((o - t) * (o + s + s * s))
-g1 = scale (1.0 Prelude./ 3) ((scale 2 o) - s - s * s)
+pi0,pi1,pi2 :: T Sym3
+pi0 = scale (1.0 Prelude./6) $ ( o + t) * ( o + s + s*s )
+pi1 = scale (1.0 Prelude./6) $ ( o - t) * ( o + s + s*s )
+pi2 = scale (1.0 Prelude./3) $ ( scale 2 o - s - s*s )
 
 inbasis :: Box
 inbasis = 
@@ -96,6 +96,15 @@ proj pr bss =
       xs = col [text (show x) | x <- bss ]
       e1xs = col [text (show (pr * x)) | x <- bss ]
   in  hsep 4 bottom [ xs, e1xs ]
+
+tbl  :: [ T Sym3 ] -> [ T Sym3 ] ->  Box
+tbl xs ys = 
+  let col = vsep 2 right
+      lftcol = col (text "" : [text (show x) | x <- xs ])
+      prods = [ col (text (show y) 
+                    : [ text (show (x * y)) | x <- xs ] 
+                    ) | y <- ys ]
+  in  hsep 4 bottom ( lftcol : prods )
 
 
 
@@ -122,11 +131,6 @@ randomMatrix
 randomMatrix p = apply <$> randomElement p
 
 
-
-e1,f1,g1 :: T Sym3
-e1 = scale (1.0 Prelude./6) $ ( o + t) * ( o + s + s*s )
-f1 = scale (1.0 Prelude./6) $ ( o - t) * ( o + s + s*s )
-g1 = scale (1.0 Prelude./3) $ ( scale 2 o - s - s*s )
 
 main :: IO()
 main = putStrLn "Hello!"
