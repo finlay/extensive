@@ -1,4 +1,4 @@
-IMAGE := docker.dragonfly.co.nz/finlay/extensive:v3
+IMAGE := docker.dragonfly.co.nz/finlay/extensive:v4
 
 SRC := $(shell find src -name "*.hs")
 HASDOCKER ?= $(shell which docker-engine || which docker)
@@ -6,7 +6,7 @@ RUN := $(if $(HASDOCKER), docker run --net host --rm -v $$PWD:/work -w /work $(I
 
 DATE := $(shell date +"%Y-%m-%d")
 
-all: timings/$(DATE)-inverse.csv timings/$(DATE)-inverse.pdf
+all: timings/$(DATE)-inverse.csv timings/$(DATE)-inverse.pdf symmetric.pdf
 
 %.csv: inverse
 	mkdir -p timings

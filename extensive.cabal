@@ -32,6 +32,7 @@ library
 executable inverse
   main-is:             inverse.hs
   build-depends:       base,
+                       boxes,
                        criterion,
                        extensive,
                        QuickCheck,
@@ -43,6 +44,7 @@ executable inverse
 executable centre-exe
   main-is:             centre.hs
   build-depends:       base,
+                       boxes,
                        criterion,
                        extensive,
                        QuickCheck,
@@ -54,6 +56,7 @@ executable symmetric-exe
   main-is:             symmetric.hs
   build-depends:       base,
                        algebra,
+                       boxes,
                        criterion,
                        extensive,
                        QuickCheck,

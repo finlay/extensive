@@ -6,6 +6,8 @@ d <- read.csv(paste0(fn))
 d$n <- gsub('(\\d)/\\d\\.\\d.*','\\1', d$Name)
 d$p <- gsub('\\d/(\\d\\.\\d).*','\\1', d$Name)
 
+d$n <- as.numeric(d$n)
+
 pdf(width=8, height=5, 
     file=paste0(gsub('.csv', '', fn), '.pdf'))
 ggplot(data=d, aes(x=n, colour=p, group=p)) + 
