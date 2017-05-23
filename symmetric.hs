@@ -2,6 +2,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DataKinds #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
 import Numeric.Algebra hiding (zero)
 import Prelude hiding ((+), (-), (*), (^), (/), negate, (>), (<), sum, fromInteger)
@@ -10,7 +12,6 @@ import qualified Test.QuickCheck as QC
 import qualified Prelude
 import Numeric.Extensive
 import Text.PrettyPrint.Boxes
-
 
 data Sym3 
     = E | Tau | Sigma | SigmaSigma | TauSigma | TauSigmaSigma
@@ -106,6 +107,42 @@ tbl xs ys =
                     ) | y <- ys ]
   in  hsep 4 bottom ( lftcol : prods )
 
+
+-- An injection of M_2(R) into R[S_3]
+type M2 = T (Hom (N 2) (N 2))
+
+e11, e12, e22, e21 :: M2
+e11 = return (Hom (N 1) (N 1))
+e12 = return (Hom (N 1) (N 2))
+e21 = return (Hom (N 2) (N 1))
+e22 = return (Hom (N 2) (N 2))
+
+-- This is not right yet
+inject :: M2 -> T Sym3
+inject = extend inject'
+  where 
+    inject' (Hom (N 1) (N 1))
+        = scale (1/6) (scale 2 o - s - s * s 
+             + scale (sqrt 3) t * s - scale (sqrt 3) t * s * s)
+    inject' (Hom (N 2) (N 2))
+        = scale (1/6) (scale 2 o - s - s * s 
+             - scale (sqrt 3) t * s + scale (sqrt 3) t * s * s)
+    inject' (Hom (N 1) (N 2))
+        = scale (1/6) $ t * (scale 2 o - s - s * s 
+             + scale (sqrt 3) t * s - scale (sqrt 3) t * s * s)
+    inject' (Hom (N 2) (N 1))
+        = scale (1/6) $ t * (scale 2 o - s - s * s 
+             - scale (sqrt 3) t * s + scale (sqrt 3) t * s * s)
+
+check_inject :: [(M2, M2, Bool, T Sym3, T Sym3)]
+check_inject = tests
+  where
+    tests = do 
+        l <- map return elements
+        r <- map return elements
+        let left = inject l * inject r 
+        let right = inject $ hom (apply l . apply r)
+        return $ (l, r, left == right, left, right)
 
 
 
