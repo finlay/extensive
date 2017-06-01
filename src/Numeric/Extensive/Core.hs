@@ -21,10 +21,13 @@ import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import qualified Prelude
 
 newtype R = R Double 
-    deriving (Num, Eq, Ord, Fractional, 
+    deriving (Num, Ord, Fractional, 
               Arbitrary, RealFrac, PrintfArg, Real, Floating)
 epsilon :: R
 epsilon = R 1e-6 -- fast and approximate 
+
+instance Eq R where
+    x == y = abs (x - y) < epsilon
 
 instance Show R where
     show (R n) = show n
