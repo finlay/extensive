@@ -1,4 +1,7 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DataKinds #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns -Wno-orphans #-}
 -- How to calculate the center of a Lie Algebra.
 
 -- Borrowing ideas from deGraaf
@@ -7,6 +10,8 @@ import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 --import qualified Prelude
 import Numeric.Extensive
 import Numeric.Quaternion
+import Text.PrettyPrint.Boxes
+import Data.List
 
 --  hom $ l . kernel l == zero
 kernel :: (T a -> T b) -> T (N n) -> T a
@@ -38,3 +43,88 @@ kernel_test = extend t'
 -- 
 main :: IO()
 main = putStrLn "Hi"
+
+
+
+
+--------------------------------------------------------------------------------
+-- Experiments with H tensor H tensor H
+
+type HT = T (Tensor (Tensor H H) H)
+instance Multiplicative (T (Tensor (Tensor H H) H)) where
+  (*) x' y' = extend muHHH (x' `tensor` y')
+    where 
+      muHHH (Tensor (Tensor (Tensor xe ye) ze) (Tensor ( Tensor xe' ye') ze'))
+        = ((return xe) * (return xe')) 
+                `tensor` ((return ye) * (return ye')) 
+                `tensor` ((return ze) * (return ze'))
+
+ijk :: [ T H ]
+ijk = [i,j,k]
+    
+eee :: [ HT ]
+eee = [ e `tensor` e `tensor` e ]
+so31 :: [ HT ]
+so31 = [ x `tensor` e `tensor` e | x <- ijk]
+so32 :: [ HT ]
+so32 = [ e `tensor` x `tensor` e | x <- ijk]
+so33 :: [ HT ]
+so33 = [ e `tensor` e `tensor` x | x <- ijk]
+
+
+g33 :: [ HT ]
+g33 = [ x `tensor` y `tensor` z
+      | x <- ijk, y <- ijk, z <- ijk ]  
+
+
+tbl  :: [ HT ] -> [ HT ] ->  Box
+tbl xs ys = 
+  let col = vsep 1 right
+      lftcol = col (text "" : [text (show x) | x <- xs ])
+      prods = [ col (text (show y) 
+                    : [ text (show (x `comm` y)) | x <- xs ] 
+                    ) | y <- ys ]
+  in  hsep 3 bottom ( lftcol : prods )
+
+
+p1 :: HT -> HT
+p1 = extend p1'
+  where
+    p1' :: Tensor (Tensor H H) H -> HT
+    p1' ( x `Tensor` y `Tensor` z)
+        = return ( x `Tensor` y `Tensor` z)
+        + return ( y `Tensor` z `Tensor` x)
+        + return ( z `Tensor` x `Tensor` y)
+        + return ( x `Tensor` z `Tensor` y)
+        + return ( y `Tensor` x `Tensor` z)
+        + return ( z `Tensor` y `Tensor` x)
+
+p2 :: HT -> HT
+p2 = extend p2'
+  where
+    p2' :: Tensor (Tensor H H) H -> HT
+    p2' ( x `Tensor` y `Tensor` z)
+        = return ( x `Tensor` y `Tensor` z)
+        + return ( y `Tensor` z `Tensor` x)
+        + return ( z `Tensor` x `Tensor` y)
+        - return ( x `Tensor` z `Tensor` y)
+        - return ( y `Tensor` x `Tensor` z)
+        - return ( z `Tensor` y `Tensor` x)
+
+p3 :: HT -> HT
+p3 = extend p3'
+  where
+    p3' :: Tensor (Tensor H H) H -> HT
+    p3' ( x `Tensor` y `Tensor` z)
+        = (scale 2 $ return ( x `Tensor` y `Tensor` z))
+        - return ( y `Tensor` z `Tensor` x)
+        - return ( z `Tensor` x `Tensor` y)
+
+tau :: HT -> HT
+tau = extend tau'
+  where
+    tau' :: Tensor (Tensor H H) H -> HT
+    tau' ( x `Tensor` y `Tensor` z)
+        = return ( y `Tensor` x `Tensor` z)
+
+
