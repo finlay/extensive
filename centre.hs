@@ -149,6 +149,11 @@ tauHHH = (. ttau)
     ttau :: End (Tensor H H)
     ttau = extend (\(x `Tensor` y) -> return (y `Tensor` x))
 
+l :: HT -> HT
+l = invToend . hom . tauHHH .  apply . toend
+
+allHT :: [ HT ]
+allHT = basis
 
 
 
