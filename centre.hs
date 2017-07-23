@@ -11,7 +11,6 @@ import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import Numeric.Extensive
 import Numeric.Quaternion
 import Text.PrettyPrint.Boxes
-import Data.List
 
 --  hom $ l . kernel l == zero
 kernel :: (T a -> T b) -> T (N n) -> T a
@@ -126,5 +125,32 @@ tau = extend tau'
     tau' :: Tensor (Tensor H H) H -> HT
     tau' ( x `Tensor` y `Tensor` z)
         = return ( y `Tensor` x `Tensor` z)
+
+
+--------------------------------------------------------------------------------
+-- Pull back from Hom (Tensor H H) H
+--------------------------------------------------------------------------------
+toend :: HT -> T (Hom (Tensor H H) H)
+toend = extend toend1
+  where
+    toend1 :: Tensor (Tensor H H) H -> T (Hom (Tensor H H) H)
+    toend1 (x `Tensor` y `Tensor` z) = hom $ extend (appl x y z)
+    appl :: H -> H -> H -> Tensor H H -> T H
+    appl x y z (a `Tensor` b) =
+        return x * return a * return y * return b * return z
+
+invToend :: T (Hom (Tensor H H) H) -> HT
+invToend = inverse toend
+
+
+tauHHH :: (T (Tensor H H) -> T H) ->  T (Tensor H H) -> T H
+tauHHH = (. ttau)
+  where
+    ttau :: End (Tensor H H)
+    ttau = extend (\(x `Tensor` y) -> return (y `Tensor` x))
+
+
+
+
 
 
