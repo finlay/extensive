@@ -76,6 +76,18 @@ g33 = [ x `tensor` y `tensor` z
       | x <- ijk, y <- ijk, z <- ijk ]  
 
 
+g12 :: [ HT ]
+g12 = [ x `tensor` y `tensor` e 
+      | x <- ijk, y <- ijk ]
+
+g13 :: [ HT ]
+g13 = [ x `tensor` e `tensor` y 
+      | x <- ijk, y <- ijk ]
+
+g23 :: [ HT ]
+g23 = [ e `tensor` x `tensor` y 
+      | x <- ijk, y <- ijk ]
+
 tbl  :: [ HT ] -> [ HT ] ->  Box
 tbl xs ys = 
   let col = vsep 1 right
@@ -84,6 +96,24 @@ tbl xs ys =
                     : [ text (show (x `comm` y)) | x <- xs ] 
                     ) | y <- ys ]
   in  hsep 3 bottom ( lftcol : prods )
+
+
+-- [di,dj] = 2 dk
+-- [dj,dk] = 2 di
+-- [dk,di] = 2 dj
+
+diag :: T (Tensor H H)
+diag = e `tensor` e + i `tensor` i + j `tensor` j + k `tensor` k
+
+di, dj, dk :: HT
+di =  scale (1 Prelude./ 12) $ p1 $ diag `tensor` i
+dj =  scale (1 Prelude./ 12) $ p1 $ diag `tensor` j
+dk =  scale (1 Prelude./ 12) $ p1 $ diag `tensor` k
+
+fi, fj, fk :: HT
+fi =  scale (1 Prelude./ 2) $ p1 $ e `tensor` e `tensor` i
+fj =  scale (1 Prelude./ 2) $ p1 $ e `tensor` e `tensor` j
+fk =  scale (1 Prelude./ 2) $ p1 $ e `tensor` e `tensor` k
 
 
 p1 :: HT -> HT
@@ -140,7 +170,7 @@ toend = extend toend1
         return x * return a * return y * return b * return z
 
 invToend :: T (Hom (Tensor H H) H) -> HT
-invToend = inverse toend
+invToend = scale (1 Prelude./16) . transpose toend
 
 
 tauHHH :: (T (Tensor H H) -> T H) ->  T (Tensor H H) -> T H
