@@ -28,8 +28,15 @@ randomElement p
              return $ if r then a else b
       els :: FiniteSet a => IO [T a]
       els = mapM (choose p zero . return) elements
+      normalise :: R -> R
+      normalise a =
+        let s = signum a
+            v = abs a  
+        in if v == 0
+            then 0
+            else s * (log v)
       sce :: T a -> IO (T a)
-      sce b = fmap (\x -> scale x b) (QC.generate QC.arbitrary )
+      sce b = fmap (\x ->  scale (normalise x) b) (QC.generate QC.arbitrary )
 
 randomMatrix 
     :: (FiniteSet a, Eq a, FiniteSet b, Eq b) 
@@ -39,6 +46,7 @@ randomMatrix p = apply <$> randomElement p
 runTest :: Integer -> Double -> IO String
 runTest i p = do
     case someNatVal i of
+        Nothing -> return ""
         Just (SomeNat (_ :: Proxy n)) -> do
             a :: T (N n) -> T (N n) <- randomMatrix p
             return $ show  a
@@ -51,3 +59,10 @@ main
       | p <- [0.0,0.1 .. 1.0 ] ] 
     | n <- [ 1 .. 10 ] ]
 
+test :: IO ()
+test = do
+  m <- randomMatrix 0.7 :: IO (T (N 12) -> T (N 12))
+  print m  
+  let invm = inverse m
+  print invm  
+  print (invm . m)
