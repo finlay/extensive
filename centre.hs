@@ -98,6 +98,18 @@ tbl xs ys =
   in  hsep 3 bottom ( lftcol : prods )
 
 
+sso31 :: [ HT ]
+sso31 = [ x `tensor` e `tensor` e - e `tensor` x `tensor` e | x <- ijk]
+
+sso31p :: [ HT ]
+sso31p = [ x `tensor` e `tensor` e + e `tensor` x `tensor` e | x <- ijk]
+
+sso32 :: [ HT ]
+sso32 = [ e `tensor` x `tensor` e - e `tensor` e `tensor` x | x <- ijk]
+
+sso32p :: [ HT ]
+sso32p = [ e `tensor` x `tensor` e + e `tensor` e `tensor` x | x <- ijk]
+
 -- [di,dj] = 2 dk
 -- [dj,dk] = 2 di
 -- [dk,di] = 2 dj
@@ -110,10 +122,42 @@ di =  scale (1 Prelude./ 12) $ p1 $ diag `tensor` i
 dj =  scale (1 Prelude./ 12) $ p1 $ diag `tensor` j
 dk =  scale (1 Prelude./ 12) $ p1 $ diag `tensor` k
 
+-- [fi,fj] = 2 fk
+-- [fj,fk] = 2 fi
+-- [fk,fi] = 2 fj
+
 fi, fj, fk :: HT
-fi =  scale (1 Prelude./ 2) $ p1 $ e `tensor` e `tensor` i
-fj =  scale (1 Prelude./ 2) $ p1 $ e `tensor` e `tensor` j
-fk =  scale (1 Prelude./ 2) $ p1 $ e `tensor` e `tensor` k
+fi =  p1 $ e `tensor` e `tensor` i
+fj =  p1 $ e `tensor` e `tensor` j
+fk =  p1 $ e `tensor` e `tensor` k
+
+ee :: HT
+ee = p1 $ i `tensor` j `tensor` k
+
+iii, jjj, kkk :: HT
+iii = i `tensor` i `tensor` i
+jjj = j `tensor` j `tensor` j
+kkk = k `tensor` k `tensor` k
+eijk = p1 $ i `tensor` j `tensor` k
+
+
+hi, hj, hk :: HT
+hi =  p1 $ e `tensor` i `tensor` i
+hj =  p1 $ e `tensor` j `tensor` j
+hk =  p1 $ e `tensor` k `tensor` k
+
+hij, hik, hji, hjk, hki, hkj :: HT
+hij =  p1 $ i `tensor` j `tensor` j
+hik =  p1 $ i `tensor` k `tensor` k
+hji =  p1 $ j `tensor` i `tensor` i
+hjk =  p1 $ j `tensor` k `tensor` k
+hki =  p1 $ k `tensor` i `tensor` i
+hkj =  p1 $ k `tensor` j `tensor` j
+
+eij, ekj, ejk :: HT
+eij =  p1 $ e `tensor` i `tensor` j
+eki =  p1 $ e `tensor` i `tensor` k
+ejk =  p1 $ e `tensor` j `tensor` k
 
 
 p1 :: HT -> HT
