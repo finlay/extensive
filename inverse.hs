@@ -61,7 +61,7 @@ main
 
 test :: IO ()
 test = do
-  m <- randomMatrix 0.7 :: IO (T (N 12) -> T (N 12))
+  m <- randomMatrix 0.7 :: IO (T (N 6) -> T (N 6))
   print m  
   let invm = inverse m
   print invm  
