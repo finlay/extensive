@@ -226,7 +226,7 @@ codual (T x)  = x . delta
 
 -- Expensive
 dual :: (FiniteSet a, Eq a) => (a -> R) -> T a
-dual x = T $ \y -> sum $ map (\e -> x e * y e) elements
+dual x = sum $ map (\e -> scale (x e) (return e)) elements
 
 dot :: Eq a => T a -> T a -> R
 dot (T y) = y . codual

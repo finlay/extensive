@@ -18,7 +18,7 @@ kernel _l = undefined
 
 test :: T H -> T H
 test = extend t'
-  where 
+  where
     t' E = return E
     t' I = return I
     t' J = zero
@@ -26,24 +26,24 @@ test = extend t'
 
 kernel_test :: T (N 2) -> T H
 kernel_test = extend t'
-  where 
+  where
     t' (N 1) = return J
     t' (N 2) = return K
 
 -- If we have an algebra, how do we calculate the centre ?
 -- And what does the answer look like ?
--- 
--- centre :: (FiniteSet a, FiniteSet b) 
+--
+-- centre :: (FiniteSet a, FiniteSet b)
 --        => T a -> ( T b, T b -> T a)
 -- centre _
 --   = let bas :: [a]
---         bas = elements 
+--         bas = elements
 --     in  undefined
--- 
+--
 main :: IO()
 main = putStrLn "Hi"
 
-
+(⊗) = tensor
 
 
 --------------------------------------------------------------------------------
@@ -52,15 +52,15 @@ main = putStrLn "Hi"
 type HT = T (Tensor (Tensor H H) H)
 instance Multiplicative (T (Tensor (Tensor H H) H)) where
   (*) x' y' = extend muHHH (x' `tensor` y')
-    where 
+    where
       muHHH (Tensor (Tensor (Tensor xe ye) ze) (Tensor ( Tensor xe' ye') ze'))
-        = ((return xe) * (return xe')) 
-                `tensor` ((return ye) * (return ye')) 
+        = ((return xe) * (return xe'))
+                `tensor` ((return ye) * (return ye'))
                 `tensor` ((return ze) * (return ze'))
 
 ijk :: [ T H ]
 ijk = [i,j,k]
-    
+
 eee :: [ HT ]
 eee = [ e `tensor` e `tensor` e ]
 so31 :: [ HT ]
@@ -73,27 +73,27 @@ so33 = [ e `tensor` e `tensor` x | x <- ijk]
 
 g33 :: [ HT ]
 g33 = [ x `tensor` y `tensor` z
-      | x <- ijk, y <- ijk, z <- ijk ]  
+      | x <- ijk, y <- ijk, z <- ijk ]
 
 
 g12 :: [ HT ]
-g12 = [ x `tensor` y `tensor` e 
+g12 = [ x `tensor` y `tensor` e
       | x <- ijk, y <- ijk ]
 
 g13 :: [ HT ]
-g13 = [ x `tensor` e `tensor` y 
+g13 = [ x `tensor` e `tensor` y
       | x <- ijk, y <- ijk ]
 
 g23 :: [ HT ]
-g23 = [ e `tensor` x `tensor` y 
+g23 = [ e `tensor` x `tensor` y
       | x <- ijk, y <- ijk ]
 
 tbl  :: [ HT ] -> [ HT ] ->  Box
-tbl xs ys = 
+tbl xs ys =
   let col = vsep 1 right
       lftcol = col (text "" : [text (show x) | x <- xs ])
-      prods = [ col (text (show y) 
-                    : [ text (show (x `comm` y)) | x <- xs ] 
+      prods = [ col (text (show y)
+                    : [ text (show (x `comm` y)) | x <- xs ]
                     ) | y <- ys ]
   in  hsep 3 bottom ( lftcol : prods )
 

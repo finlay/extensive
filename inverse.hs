@@ -38,10 +38,17 @@ randomElement p
       sce :: T a -> IO (T a)
       sce b = fmap (\x ->  scale (normalise x) b) (QC.generate QC.arbitrary )
 
+
 randomMatrix 
     :: (FiniteSet a, Eq a, FiniteSet b, Eq b) 
     => Double -> IO (T a -> T b)
-randomMatrix p = apply <$> randomElement p
+randomMatrix p = do
+  let mkelem a = do
+        e <- randomElement p
+        return (a, e)
+  pairs <- mapM mkelem elements 
+  let l' x = maybe zero id $ lookup x pairs
+  return $ extend l'
 
 runTest :: Integer -> Double -> IO String
 runTest i p = do
@@ -51,8 +58,8 @@ runTest i p = do
             a :: T (N n) -> T (N n) <- randomMatrix p
             return $ show  a
     
-main :: IO()
-main 
+_main :: IO()
+_main 
   = defaultMain 
     [ bgroup (show n)
       [ bench (show p) $ nfIO $ runTest n p
@@ -63,6 +70,33 @@ test :: IO ()
 test = do
   m <- randomMatrix 0.7 :: IO (T (N 6) -> T (N 6))
   print m  
-  let invm = inverse m
-  print invm  
-  print (invm . m)
+  let atam = ata m
+  print atam  
+--  let atam' = ata' m
+--  print atam'  
+
+
+ata
+  :: forall a b . (FiniteSet a, FiniteSet b, Eq a, Eq b, Show b)
+  => (T a -> T b) -> T b -> T b
+ata a =
+  let s x y w = let T a' = a (return x)
+                in  (a' w) * (a' (delta y))
+      ata' y = T $ \w -> sum [ s x y w | x <- elements ]
+  in  extend ata'
+
+-- transpose lm = dual . (\b -> \a -> let T vb = lm $ return a in vb b) . codual
+--
+ata'
+  :: forall a b . (FiniteSet a, FiniteSet b, Eq a, Eq b, Show b)
+  => (T a -> T b) -> T b -> T b
+ata' a = a . transpose a
+
+
+--- Scratch
+diag :: a -> (a, a)
+diag a = (a,a)
+
+
+
+
