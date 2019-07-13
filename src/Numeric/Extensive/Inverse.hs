@@ -3,7 +3,7 @@ module Numeric.Extensive.Inverse where
 
 --import Debug.Trace
 import Numeric.Algebra
-import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger, recip, (/))
+import Prelude hiding ((+), (-), (*), (^), negate, (>), sum, fromInteger, recip, (/))
 import qualified Prelude
 
 import Numeric.Extensive.Core
@@ -33,7 +33,7 @@ inversePre
   => (T a -> T b) -> (T b -> T a, T a -> T a, T a -> T a)
 inversePre a
   = let at = transpose a
-        diags = [ (x,y) | x <- elements , y <- elements , x Prelude.< y ]
+        diags = [ (x,y) | x <- elements , y <- elements , x < y ]
         ls = LS (force $ at . a) id diags
         (d,r) = loop ls
         inva = force $ r . invDiagonal d . transpose r . at
@@ -44,7 +44,7 @@ inversePost
   => (T a -> T b) -> T b -> T a
 inversePost a
   = let at = transpose a
-        diags = [ (x,y) | x <- elements , y <- elements , x Prelude.< y ]
+        diags = [ (x,y) | x <- elements , y <- elements , x < y ]
         ls = LS (force $ a . at) id diags
         (d,r) = loop ls
     in  force $ at . r . invDiagonal d . transpose r
@@ -53,7 +53,7 @@ inversePost a
 --   => (T a -> T b) -> (T b -> T a, End b, T a -> T b, End a)
 -- inversePost a
 --   = let at = transpose a
---         diags = [ (x,y) | x <- elements , y <- elements , x Prelude.< y ]
+--         diags = [ (x,y) | x <- elements , y <- elements , x < y ]
 --         ls = LS (force $ a . at) id diags
 --         (d,r) = loop ls
 --         sqrtd = sqrtDiagonal d
@@ -103,10 +103,10 @@ loop (LS d r (diag@(x,y):diags))
                 d'  = transpose rot . d . rot
                 newdiags = [ (x ,y') | y' <- elements
                                      , y /= y'
-                                     , x  Prelude.< y']
+                                     , x  < y']
                         ++ [ (x',y ) | x' <- elements
                                      , x /= x'
-                                     , x' Prelude.< y ]
+                                     , x' < y ]
                 diags' = diags ++ [ d | d <- newdiags, not (elem d diags)]
             in  loop (LS (force d') (force $ r . rot) diags')
 
