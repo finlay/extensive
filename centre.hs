@@ -139,7 +139,7 @@ p1 = extend (scale (1 Prelude./ 6) . p1')
         + return ( z `Tensor` y `Tensor` x)
 
 p2 :: HT -> HT
-p2 = extend p2'
+p2 = extend (scale (1 Prelude./ 6) . p2')
   where
     p2' :: Tensor (Tensor H H) H -> HT
     p2' ( x `Tensor` y `Tensor` z)
@@ -151,7 +151,7 @@ p2 = extend p2'
         - return ( z `Tensor` y `Tensor` x)
 
 p3 :: HT -> HT
-p3 = extend p3'
+p3 = extend (scale (1 Prelude./ 3) . p3')
   where
     p3' :: Tensor (Tensor H H) H -> HT
     p3' ( x `Tensor` y `Tensor` z)
