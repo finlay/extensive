@@ -2,7 +2,7 @@
 
 This repo collects a range of random musing regarding the encoding of linear
 algebra in haskell. The idea involve building on Ander Kock's
-[http://tildeweb.au.dk/au76680/CMTD.pdf Commutative monads as a theory of distributions].
+[Commutative monads as a theory of distributions](http://tildeweb.au.dk/au76680/CMTD.pdf).
 
 Essentially, the monad of co-vectors, over `a` form a vector space.
 

@@ -66,9 +66,9 @@ _main
       | p <- [0.0,0.1 .. 1.0 ] ] 
     | n <- [ 1 .. 10 ] ]
 
-main :: IO ()
-main = do
-  m <- randomMatrix 0.7 :: IO (T (N 64) -> T (N 64))
+test :: IO ()
+test = do
+  m <- randomMatrix 0.7 :: IO (T (N 6) -> T (N 6))
   print m  
   let atam = ata m
   print atam  
