@@ -43,6 +43,7 @@ kernel_test = extend t'
 main :: IO()
 main = putStrLn "Hi"
 
+(⊗) :: T a -> T b -> T (Tensor a b)
 (⊗) = tensor
 
 
@@ -106,18 +107,27 @@ diag :: T (Tensor H H)
 diag = e `tensor` e + i `tensor` i + j `tensor` j + k `tensor` k
 
 di, dj, dk :: HT
-di =  scale (1 Prelude./ 12) $ p1 $ diag `tensor` i
-dj =  scale (1 Prelude./ 12) $ p1 $ diag `tensor` j
-dk =  scale (1 Prelude./ 12) $ p1 $ diag `tensor` k
+di =  scale (1 Prelude./2) $ p1 $ diag `tensor` i
+dj =  scale (1 Prelude./2) $ p1 $ diag `tensor` j
+dk =  scale (1 Prelude./2) $ p1 $ diag `tensor` k
+
+-- [fi,fj] = 2 fk
+-- [fj,fk] = 2 fi
+-- [fk,fi] = 2 fj
 
 fi, fj, fk :: HT
-fi =  scale (1 Prelude./ 2) $ p1 $ e `tensor` e `tensor` i
-fj =  scale (1 Prelude./ 2) $ p1 $ e `tensor` e `tensor` j
-fk =  scale (1 Prelude./ 2) $ p1 $ e `tensor` e `tensor` k
+fi =  scale 3 $ p1 $ e `tensor` e `tensor` i
+fj =  scale 3 $ p1 $ e `tensor` e `tensor` j
+fk =  scale 3 $ p1 $ e `tensor` e `tensor` k
+
+-- [di,fj] = 2 dk
+-- [dj,fk] = 2 di
+-- [dk,fi] = 2 dj
+
 
 
 p1 :: HT -> HT
-p1 = extend p1'
+p1 = extend (scale (1 Prelude./ 6) . p1')
   where
     p1' :: Tensor (Tensor H H) H -> HT
     p1' ( x `Tensor` y `Tensor` z)
