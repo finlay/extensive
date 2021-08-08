@@ -1,10 +1,10 @@
-{ mkDerivation, algebra, base, boxes, criterion, mtl, pretty
-, QuickCheck, random, stdenv
+{ mkDerivation, algebra, base, boxes, criterion, lib, mtl, pretty
+, QuickCheck, random
 }:
 mkDerivation {
   pname = "extensive";
   version = "0.1.0.0";
-  src = /home/finlay/haskell/extensive;
+  src = ./.;
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [
@@ -14,5 +14,5 @@ mkDerivation {
     algebra base boxes criterion QuickCheck random
   ];
   description = "Linear algebra following Anders Kock";
-  license = stdenv.lib.licenses.bsd3;
+  license = lib.licenses.bsd3;
 }
