@@ -18,7 +18,7 @@ kernel _l = undefined
 
 test :: T H -> T H
 test = extend t'
-  where 
+  where
     t' E = return E
     t' I = return I
     t' J = zero
@@ -26,24 +26,25 @@ test = extend t'
 
 kernel_test :: T (N 2) -> T H
 kernel_test = extend t'
-  where 
+  where
     t' (N 1) = return J
     t' (N 2) = return K
 
 -- If we have an algebra, how do we calculate the centre ?
 -- And what does the answer look like ?
--- 
--- centre :: (FiniteSet a, FiniteSet b) 
+--
+-- centre :: (FiniteSet a, FiniteSet b)
 --        => T a -> ( T b, T b -> T a)
 -- centre _
 --   = let bas :: [a]
---         bas = elements 
+--         bas = elements
 --     in  undefined
--- 
+--
 main :: IO()
 main = putStrLn "Hi"
 
-
+(⊗) :: T a -> T b -> T (Tensor a b)
+(⊗) = tensor
 
 
 --------------------------------------------------------------------------------
@@ -52,15 +53,15 @@ main = putStrLn "Hi"
 type HT = T (Tensor (Tensor H H) H)
 instance Multiplicative (T (Tensor (Tensor H H) H)) where
   (*) x' y' = extend muHHH (x' `tensor` y')
-    where 
+    where
       muHHH (Tensor (Tensor (Tensor xe ye) ze) (Tensor ( Tensor xe' ye') ze'))
-        = ((return xe) * (return xe')) 
-                `tensor` ((return ye) * (return ye')) 
+        = ((return xe) * (return xe'))
+                `tensor` ((return ye) * (return ye'))
                 `tensor` ((return ze) * (return ze'))
 
 ijk :: [ T H ]
 ijk = [i,j,k]
-    
+
 eee :: [ HT ]
 eee = [ e `tensor` e `tensor` e ]
 so31 :: [ HT ]
@@ -73,21 +74,101 @@ so33 = [ e `tensor` e `tensor` x | x <- ijk]
 
 g33 :: [ HT ]
 g33 = [ x `tensor` y `tensor` z
-      | x <- ijk, y <- ijk, z <- ijk ]  
+      | x <- ijk, y <- ijk, z <- ijk ]
 
+
+g12 :: [ HT ]
+g12 = [ x `tensor` y `tensor` e
+      | x <- ijk, y <- ijk ]
+
+g13 :: [ HT ]
+g13 = [ x `tensor` e `tensor` y
+      | x <- ijk, y <- ijk ]
+
+g23 :: [ HT ]
+g23 = [ e `tensor` x `tensor` y
+      | x <- ijk, y <- ijk ]
 
 tbl  :: [ HT ] -> [ HT ] ->  Box
-tbl xs ys = 
+tbl xs ys =
   let col = vsep 1 right
       lftcol = col (text "" : [text (show x) | x <- xs ])
-      prods = [ col (text (show y) 
-                    : [ text (show (x `comm` y)) | x <- xs ] 
+      prods = [ col (text (show y)
+                    : [ text (show (x `comm` y)) | x <- xs ]
                     ) | y <- ys ]
   in  hsep 3 bottom ( lftcol : prods )
 
 
+sso31 :: [ HT ]
+sso31 = [ x `tensor` e `tensor` e - e `tensor` x `tensor` e | x <- ijk]
+
+sso31p :: [ HT ]
+sso31p = [ x `tensor` e `tensor` e + e `tensor` x `tensor` e | x <- ijk]
+
+sso32 :: [ HT ]
+sso32 = [ e `tensor` x `tensor` e - e `tensor` e `tensor` x | x <- ijk]
+
+sso32p :: [ HT ]
+sso32p = [ e `tensor` x `tensor` e + e `tensor` e `tensor` x | x <- ijk]
+
+-- [di,dj] = 2 dk
+-- [dj,dk] = 2 di
+-- [dk,di] = 2 dj
+
+diag :: T (Tensor H H)
+diag = e `tensor` e + i `tensor` i + j `tensor` j + k `tensor` k
+
+di, dj, dk :: HT
+di =  scale (1 Prelude./2) $ p1 $ diag `tensor` i
+dj =  scale (1 Prelude./2) $ p1 $ diag `tensor` j
+dk =  scale (1 Prelude./2) $ p1 $ diag `tensor` k
+
+-- [fi,fj] = 2 fk
+-- [fj,fk] = 2 fi
+-- [fk,fi] = 2 fj
+
+fi, fj, fk :: HT
+fi =  scale 3 $ p1 $ e `tensor` e `tensor` i
+fj =  scale 3 $ p1 $ e `tensor` e `tensor` j
+fk =  scale 3 $ p1 $ e `tensor` e `tensor` k
+
+-- [di,fj] = 2 dk
+-- [dj,fk] = 2 di
+-- [dk,fi] = 2 dj
+
+
+ee :: HT
+ee = p1 $ i `tensor` j `tensor` k
+
+iii, jjj, kkk :: HT
+iii = i `tensor` i `tensor` i
+jjj = j `tensor` j `tensor` j
+kkk = k `tensor` k `tensor` k
+eijk :: HT
+eijk = p1 $ i `tensor` j `tensor` k
+
+
+hi, hj, hk :: HT
+hi =  p1 $ e `tensor` i `tensor` i
+hj =  p1 $ e `tensor` j `tensor` j
+hk =  p1 $ e `tensor` k `tensor` k
+
+hij, hik, hji, hjk, hki, hkj :: HT
+hij =  p1 $ i `tensor` j `tensor` j
+hik =  p1 $ i `tensor` k `tensor` k
+hji =  p1 $ j `tensor` i `tensor` i
+hjk =  p1 $ j `tensor` k `tensor` k
+hki =  p1 $ k `tensor` i `tensor` i
+hkj =  p1 $ k `tensor` j `tensor` j
+
+eij, eki, ejk :: HT
+eij =  p1 $ e `tensor` i `tensor` j
+eki =  p1 $ e `tensor` i `tensor` k
+ejk =  p1 $ e `tensor` j `tensor` k
+
+
 p1 :: HT -> HT
-p1 = extend p1'
+p1 = extend (scale (1 Prelude./ 6) . p1')
   where
     p1' :: Tensor (Tensor H H) H -> HT
     p1' ( x `Tensor` y `Tensor` z)
@@ -99,7 +180,7 @@ p1 = extend p1'
         + return ( z `Tensor` y `Tensor` x)
 
 p2 :: HT -> HT
-p2 = extend p2'
+p2 = extend (scale (1 Prelude./ 6) . p2')
   where
     p2' :: Tensor (Tensor H H) H -> HT
     p2' ( x `Tensor` y `Tensor` z)
@@ -111,7 +192,7 @@ p2 = extend p2'
         - return ( z `Tensor` y `Tensor` x)
 
 p3 :: HT -> HT
-p3 = extend p3'
+p3 = extend (scale (1 Prelude./ 3) . p3')
   where
     p3' :: Tensor (Tensor H H) H -> HT
     p3' ( x `Tensor` y `Tensor` z)
