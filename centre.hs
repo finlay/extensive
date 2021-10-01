@@ -140,7 +140,7 @@ toend = extend toend1
         return x * return a * return y * return b * return z
 
 invToend :: T (Hom (Tensor H H) H) -> HT
-invToend = inverse toend
+invToend = scale (1 Prelude./16) . transpose toend
 
 
 tauHHH :: (T (Tensor H H) -> T H) ->  T (Tensor H H) -> T H
