@@ -14,6 +14,14 @@ instance FiniteSet H where elements = [ E, I, J, K ]
 instance Show H where
     show E = "e" ; show I = "i"
     show J = "j" ; show K = "k"
+instance Order H where
+    order E I = Just LT;   order I E = Just GT
+    order E J = Just LT;   order J E = Just GT
+    order E K = Just LT;   order K E = Just GT
+    order I J = Just LT;   order J I = Just GT
+    order I K = Just LT;   order K I = Just GT
+    order J K = Just LT;   order K J = Just GT
+    order _ _ = Just EQ
 
 e, i, j, k :: T H
 [e,i,j,k] = map return elements
@@ -40,8 +48,8 @@ instance Multiplicative (T H) where
 -- Now lets make Tensor H H an algebra
 instance Multiplicative (T (Tensor H H)) where
     (*) x' y' = extend muHH (x' `tensor` y')
-            where 
-                muHH  (Tensor (Tensor xe ye) (Tensor xe' ye')) 
+            where
+                muHH  (Tensor (Tensor xe ye) (Tensor xe' ye'))
                     = ((return xe) * (return xe')) `tensor` ((return ye') * (return ye))
 
 comm :: (Multiplicative r, Group r)
@@ -80,10 +88,10 @@ tau = map return elements
 injectTau :: T Tau -> T (Tensor H H)
 injectTau = extend injectTau'
   where
-    injectTau' (Sym  xe ye) = let x' = return xe 
+    injectTau' (Sym  xe ye) = let x' = return xe
                                   y' = return ye
                               in  scale 0.5 (x' `tensor` y' + y' `tensor` x')
-    injectTau' (Skew xe ye) = let x' = return xe 
+    injectTau' (Skew xe ye) = let x' = return xe
                                   y' = return ye
                               in  scale 0.5 (x' `tensor` y' - y' `tensor` x')
 
@@ -94,7 +102,7 @@ injectTauInv = force $ inverse injectTau
 killing :: (Multiplicative (T a), FiniteSet a, Eq a) => T a -> T a -> R
 killing x' y' = trace (ad x' . ad y')
   where
-    ad = comm 
+    ad = comm
     trace f = sum $ map (diag f) elements
     coef (T v) = v . delta
     diag f e' = coef (f (return e')) e'
@@ -116,7 +124,7 @@ x, y, z :: T SO3
 
 instance Multiplicative (T SO3) where
     (*) x' y' = mmu (x' `tensor` y')
-      where 
+      where
         mmu :: T (Tensor SO3 SO3) -> T SO3
         mmu = extend mmu'
         mmu' (X `Tensor` X) = zero
@@ -131,18 +139,18 @@ instance Multiplicative (T SO3) where
 
 so3 :: T SO3 -> T (Tau)
 so3 = extend so3'
-  where 
+  where
     so3' X = scale (-1) $ return $ Skew E I
     so3' Y = scale (-1) $ return $ Skew E J
     so3' Z = scale (-1) $ return $ Skew E K
 
 
 -- Check if a function is a homomorphism
-isHomomorphism 
+isHomomorphism
     :: ( FiniteSet a, FiniteSet b, Eq b)
-    => (T a -> T a -> T a) 
-    -> (T b -> T b -> T b) 
-    -> (T a -> T b) -> [(T a,T a)] 
+    => (T a -> T a -> T a)
+    -> (T b -> T b -> T b)
+    -> (T a -> T b) -> [(T a,T a)]
 isHomomorphism m1 m2 l
   = [ (x1,y1) | x1 <- basis
               , y1 <- basis

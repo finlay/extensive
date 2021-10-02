@@ -8,6 +8,7 @@
 module Numeric.Extensive.Core where
 
 import Control.Monad
+import Control.Applicative ((<|>))
 import GHC.TypeLits
 import Data.Proxy
 
@@ -20,11 +21,11 @@ import Numeric.Algebra
 import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import qualified Prelude
 
-newtype R = R Double 
-    deriving (Num, Ord, Fractional, 
+newtype R = R Double
+    deriving (Num, Ord, Fractional,
               Arbitrary, RealFrac, PrintfArg, Real, Floating)
 epsilon :: R
-epsilon = R 1e-6 -- fast and approximate 
+epsilon = R 1e-6 -- fast and approximate
 
 instance Eq R where
     x == y = abs (x - y) < epsilon
@@ -34,7 +35,7 @@ instance Show R where
 
 instance Order R where
     order a b = Just (compare a b)
-    
+
 instance Additive R where
   (+) = (Prelude.+)
   --sinnum1p n r = (1 Prelude.+ toNatural n) * r
@@ -60,7 +61,7 @@ instance LeftModule  Integer R where (.*)   = (*) . fromIntegral
 instance RightModule Natural R where m *. n = m * fromIntegral n
 instance RightModule Integer R where m *. n = m * fromIntegral n
 
-instance Monoidal R where 
+instance Monoidal R where
   zero = 0
   sinnum n r = fromIntegral n * r
 
@@ -77,7 +78,7 @@ instance Ring R  where fromInteger = Prelude.fromInteger
 
 newtype T a = T ((a -> R) -> R)
 
-instance Functor T where 
+instance Functor T where
     fmap f (T xs) = T $ \r -> xs (r . f)
 
 instance Applicative T where
@@ -86,16 +87,16 @@ instance Applicative T where
 
 instance Monad T where
     return x      = T $ \k -> k x
-    (T x) >>= y   = T $ \k -> x $ \f -> let T yf = y f in yf k 
+    (T x) >>= y   = T $ \k -> x $ \f -> let T yf = y f in yf k
 
 scale :: R  -> T a -> T a
-scale r (T x) = T $ (r *) . x 
+scale r (T x) = T $ (r *) . x
 
 instance Monoidal (T a) where
     zero = T $ \_ -> 0
 
 minus :: T a -> T a
-minus (T x) = T $ negate . x 
+minus (T x) = T $ negate . x
 
 plus :: T a -> T a -> T a
 plus (T x) (T y) = T $ (\ar -> x ar + y ar)
@@ -113,7 +114,7 @@ instance Group (T a) where
 
 
 instance Additive (T v) where
-    (+)   = plus 
+    (+)   = plus
 
 -- Extending a map into a the Vector space is easy peasy using the Monad instance
 -- Automatically linear
@@ -131,7 +132,7 @@ tensor tx ty =  (join . (fmap t') . t'') (Tensor tx ty)
 
 -- adj :: Hom(Va, Hom(Vb, Vc)) -> Hom(Va ⊗  Vb, Vc)
 adj :: (T a -> (T b -> T c)) -> T (Tensor a b) -> T c
--- adj f (x ⊗ y) = f(x)(y) 
+-- adj f (x ⊗ y) = f(x)(y)
 adj f = extend $ \(Tensor a b) -> f (return a) (return b)
 -- iadj :: Hom(Va, Hom(Vb, Vc)) <- Hom(Va ⊗  Vb, Vc)
 iadj :: (T (Tensor a b) -> T c) -> T a -> T b -> T c
@@ -143,14 +144,14 @@ iadj g va vb = g (va `tensor` vb)
 data Hom a b = Hom a b deriving (Eq, Ord)
 
 -- This is an expensive operation (it calles elements)
-hom :: (FiniteSet a, FiniteSet b, Eq b) 
+hom :: (FiniteSet a, FiniteSet b, Eq b)
     => (T a -> T b) -> T (Hom a b)
-hom l = 
+hom l =
   let xs = elements
       coefs = coefficients . l . return
   in  foldl1 plus [scale c (return (Hom x' y')) | x' <- xs, (y',c) <- coefs x']
 
-apply :: (Eq a) 
+apply :: (Eq a)
       => T (Hom a b) -> T a -> T b
 apply = curry (unMaybe . fmap ex . uncurry tensor)
   where
@@ -158,12 +159,12 @@ apply = curry (unMaybe . fmap ex . uncurry tensor)
     ex (Tensor (Hom x y) x') = {-# SCC "ex" #-} if x == x' then Just y else Nothing
 
 em :: (Eq a) => Hom a b -> T a -> T b
-em (Hom x y) (T vx) = 
+em (Hom x y) (T vx) =
   let em' vy x' = if x == x' then vy y else 0
   in  T $ vx . em'
 
 -- memoised multiplication
-mmul :: (Eq a, FiniteSet a, Eq c, FiniteSet c) 
+mmul :: (Eq a, FiniteSet a, Eq c, FiniteSet c)
      => (T b -> T c) -> (T a -> T b) -> (T a -> T c)
 mmul a b =  {-# SCC "mmul" #-} apply . hom $ (a . b)
 
@@ -185,6 +186,9 @@ instance (Show x, Show y) => Show (Tensor x y) where
 instance (Show x, Show y) => Show (Hom x y) where
     show (Hom x y) = show x ++ " \x21A6 " ++ show y
 
+instance (Order x, Order y) => Order (Tensor x y) where
+    order (Tensor a b) (Tensor c d) = order a c <|> order b d
+
 -- Standard data type, parametrised by data kind int
 newtype N (n::Nat) = N Integer
     deriving (Eq, Ord)
@@ -205,7 +209,7 @@ coefficients (T v) = map (\e -> (e, v (delta e))) elements
 
 instance (Eq a, FiniteSet a) => Eq (T a) where
     x' == y' =  {-# SCC "EQUALS" #-} sum (map (squared . snd) ( coefficients (subtract' x' y'))) <= epsilon
-              where 
+              where
                 squared x'' = x'' * x''
                 subtract' (T x'') (T y'') = T $ (\ar -> x'' ar - y'' ar)
 
@@ -232,7 +236,7 @@ dot :: Eq a => T a -> T a -> R
 dot (T y) = y . codual
 
 -- Transpose
-transpose :: (FiniteSet a, FiniteSet b, Eq a, Eq b) 
+transpose :: (FiniteSet a, FiniteSet b, Eq a, Eq b)
           => (T a -> T b) -> (T b -> T a)
 transpose lm = dual . (\b -> \a -> let T vb = lm $ return a in vb b) . codual
 
@@ -245,7 +249,7 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (Hom a b) where
 
 instance (Arbitrary a) => Arbitrary (T a)
   where
-    arbitrary = 
+    arbitrary =
       do
         bs    <- QC.listOf1 QC.arbitrary
         coefs <- QC.vector (length bs)
