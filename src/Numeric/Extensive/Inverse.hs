@@ -3,7 +3,7 @@ module Numeric.Extensive.Inverse where
 
 --import Debug.Trace
 import Numeric.Algebra
-import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger, recip, (/))
+import Prelude hiding ((+), (-), (*), (^), negate, (<), (>), sum, fromInteger, recip, (/))
 
 import Numeric.Extensive.Core
 import Numeric.Extensive.Print()

@@ -8,6 +8,7 @@
 module Numeric.Extensive.Core where
 
 import Control.Monad
+import Control.Applicative ((<|>))
 import GHC.TypeLits
 import Data.Proxy
 
@@ -184,6 +185,9 @@ instance (Show x, Show y) => Show (Tensor x y) where
 
 instance (Show x, Show y) => Show (Hom x y) where
     show (Hom x y) = show x ++ " \x21A6 " ++ show y
+
+instance (Order x, Order y) => Order (Tensor x y) where
+    order (Tensor a b) (Tensor c d) = order a c <|> order b d
 
 -- Standard data type, parametrised by data kind int
 newtype N (n::Nat) = N Integer

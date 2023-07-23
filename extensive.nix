@@ -1,5 +1,5 @@
 { mkDerivation, algebra, base, boxes, criterion, lib, mtl, pretty
-, QuickCheck, random
+, QuickCheck, random, cabal
 }:
 mkDerivation {
   pname = "extensive";

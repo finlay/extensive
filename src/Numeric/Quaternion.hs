@@ -15,7 +15,13 @@ instance Show H where
     show E = "e" ; show I = "i"
     show J = "j" ; show K = "k"
 instance Order H where
-    order a b = Just (compare a b)
+    order E I = Just LT;   order I E = Just GT
+    order E J = Just LT;   order J E = Just GT
+    order E K = Just LT;   order K E = Just GT
+    order I J = Just LT;   order J I = Just GT
+    order I K = Just LT;   order K I = Just GT
+    order J K = Just LT;   order K J = Just GT
+    order _ _ = Just EQ
 
 e, i, j, k :: T H
 [e,i,j,k] = map return elements
