@@ -1,7 +1,7 @@
 name:                extensive
 version:             0.1.0.0
 synopsis:            Linear algebra following Anders Kock
--- description:         
+-- description:
 license:             BSD3
 license-file:        LICENSE
 author:              Finlay Thompson
@@ -17,7 +17,7 @@ library
                      , Numeric.Extensive.Core
                      , Numeric.Extensive.Inverse
                      , Numeric.Extensive.Print
-  -- other-modules:       
+  -- other-modules:
   build-depends:       base,
                        algebra,
                        QuickCheck,
@@ -38,10 +38,10 @@ executable inverse
                        QuickCheck,
                        random
   extensions:          DataKinds,ScopedTypeVariables
-  ghc-options:         -Wall -fno-warn-name-shadowing -O3 -threaded -fprof-auto 
+  ghc-options:         -Wall -fno-warn-name-shadowing -O3 -threaded -fprof-auto
                        "-with-rtsopts=-N -p -s -h -i0.1"
   default-language:    Haskell2010
-                       
+
 
 executable centre-exe
   main-is:             centre.hs
@@ -53,7 +53,7 @@ executable centre-exe
                        random
   ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded
   default-language:    Haskell2010
-                       
+
 executable symmetric-exe
   main-is:             symmetric.hs
   build-depends:       base,
@@ -65,5 +65,18 @@ executable symmetric-exe
                        random
   ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded
   default-language:    Haskell2010
-                       
+
+
+executable electro-exe
+  main-is:             electro.hs
+  build-depends:       base,
+                       algebra,
+                       boxes,
+                       criterion,
+                       extensive,
+                       QuickCheck,
+                       random
+  ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded
+  default-language:    Haskell2010
+
 
