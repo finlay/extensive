@@ -64,3 +64,18 @@ main = do
   putStrLn "Inverse Brauer map"
   showInvBr
 
+
+-- Show all full algebra of H Tensor H
+showHTH :: IO ()
+showHTH = do
+  let showLine (x,y) = show x ++ " × " ++ show y ++ " = " ++ show (x * y)
+  mapM_ (putStrLn . showLine) [ (x, y) | x <- tau, y <- tau ]
+
+
+showHTH2 :: IO ()
+showHTH2 = do
+  let showLine (x,y) = show x ++ " × " ++ show y ++ " = " ++ show (x * y - y * x)
+  mapM_ (putStrLn . showLine) [ (x, y) | x <- tau, y <- tau ]
+
+
+
