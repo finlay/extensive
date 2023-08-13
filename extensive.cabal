@@ -3,7 +3,7 @@ name:                extensive
 version:             0.1.0.0
 synopsis:            Linear algebra following Anders Kock
 -- description:
-license:             BSD3
+license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Finlay Thompson
 maintainer:          finlay.thompson@gmail.com
