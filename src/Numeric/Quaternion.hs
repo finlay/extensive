@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns #-}
 module Numeric.Quaternion where
 
 import Numeric.Algebra hiding (zero)
@@ -51,9 +52,6 @@ instance Multiplicative (T (Tensor H H)) where
             where
                 muHH  (Tensor (Tensor xe ye) (Tensor xe' ye'))
                     = ((return xe) * (return xe')) `tensor` ((return ye') * (return ye))
-
-instance Order (Tensor H H) where
-    order (a `Tensor` b) (c `Tensor` d) = Just $ (compare a c) <> (compare b d)
 
 comm :: (Multiplicative r, Group r)
      => r -> r -> r

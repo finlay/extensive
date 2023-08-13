@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE BangPatterns #-}
 module Numeric.Extensive.Inverse where
 
 --import Debug.Trace
@@ -85,7 +86,7 @@ sqrtDiagonal l
 data LoopState a
   = LS (End a)      -- transpose $ D := A^TA  $
        (End a)      -- rotation  $ R := Id    $
-       ! [(a,a)]      -- diagonals that need checking
+       [(a,a)]      -- diagonals that need checking
 
 isZero :: R -> Bool
 isZero r = abs r < 1e-8

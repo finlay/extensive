@@ -16,7 +16,6 @@ import Test.QuickCheck (Arbitrary)
 import qualified Test.QuickCheck as QC
 
 import Text.Printf
-import Numeric.Natural
 import Numeric.Algebra
 import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import qualified Prelude
@@ -86,7 +85,6 @@ instance Applicative T where
   T mf <*> T ma   = T $ \k -> mf $ \f -> ma $ k . f
 
 instance Monad T where
-    return x      = T $ \k -> k x
     (T x) >>= y   = T $ \k -> x $ \f -> let T yf = y f in yf k
 
 scale :: R  -> T a -> T a
