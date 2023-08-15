@@ -7,6 +7,8 @@ import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import Numeric.Extensive
 import Numeric.Quaternion
 
+import qualified Text.PrettyPrint.Boxes as Box
+
 
 br :: T (Tensor H H) -> T (Hom H H)
 br = extend $ hom . br'
@@ -74,8 +76,16 @@ showHTH = do
 
 showHTH2 :: IO ()
 showHTH2 = do
-  let showLine (x,y) = show x ++ " × " ++ show y ++ " = " ++ show (x * y - y * x)
+  let showLine (x,y) = "[" ++ show x ++ ", " ++ show y ++ " ] = " ++ show (x * y - y * x)
   mapM_ (putStrLn . showLine) [ (x, y) | x <- tau, y <- tau ]
+
+
+showComm :: (Show a) => (a -> a -> a) -> [a] -> [a] -> IO ()
+showComm com left right  =
+  let col  = Box.vsep 1 Box.right
+      xs   = col ( Box.text "" : [Box.text (show x) | x <- left ])
+      e1xs = [ col ( Box.text (show y) : [Box.text (show (com x y)) | x <- left ]) | y <- right ]
+  in  putStrLn $ Box.render $ Box.hsep 2 Box.bottom ( xs: e1xs)
 
 
 

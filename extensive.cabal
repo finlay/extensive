@@ -33,6 +33,7 @@ executable jacobian-exe
   main-is:             app/jacobian.hs
   build-depends:       base,
                        extensive,
+                       boxes
 
   ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded
   default-language:    Haskell2010
