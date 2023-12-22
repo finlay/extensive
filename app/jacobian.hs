@@ -58,6 +58,19 @@ showBrDual = showMap (\x -> \y -> return (Tensor x y) :: T (Tensor H H)) (toDual
 showInvBrDual :: IO ()
 showInvBrDual = showMap (\x -> \y -> scale 4 $ return (Tensor x y) :: T (Tensor H H)) (invbr . fromDual)
 
+-- Show the map Br . Dual in tau basis.
+showBrTau :: IO ()
+showBrTau = do
+  let transform = injectTauInv  . toDual . br . injectTau
+      showLine xy = show xy ++ "  -->  " ++ show (transform xy)
+  mapM_ (putStrLn . showLine) tau
+
+showBrTauInv :: IO ()
+showBrTauInv = do
+  let transform = injectTauInv  . invbr . fromDual . injectTau
+      showLine xy = show xy ++ "  -->  " ++ show (transform xy)
+  mapM_ (putStrLn . showLine) tau
+
 
 main :: IO ()
 main = do
@@ -86,6 +99,9 @@ showComm com left right  =
       xs   = col ( Box.text "" : [Box.text (show x) | x <- left ])
       e1xs = [ col ( Box.text (show y) : [Box.text (show (com x y)) | x <- left ]) | y <- right ]
   in  putStrLn $ Box.render $ Box.hsep 2 Box.bottom ( xs: e1xs)
+
+
+
 
 
 
