@@ -38,3 +38,12 @@ executable jacobian-exe
   ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded
   default-language:    Haskell2010
 
+executable su3-exe
+  main-is:             app/su3.hs
+  build-depends:       base,
+                       extensive,
+                       boxes
+
+  ghc-options: -Wall -fno-warn-name-shadowing -O3 -threaded
+  default-language:    Haskell2010
+
