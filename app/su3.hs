@@ -82,14 +82,26 @@ showSymm = do
   mapM_ putStrLn [ show x <> " -> " <> (show $ symm x) | x <- ehhh]
 
 
+makey :: T H -> T H -> T HHH
+makey x y = scale (1/2) $ symm $ x `tensor` x `tensor` y
+yei, yie, yej, yje, yek, yke :: T HHH
 yij, yji, yik, yki, yjk, ykj :: T HHH
-yij = scale (1/2) $ symm $ i `tensor` i `tensor` j
-yji = scale (1/2) $ symm $ j `tensor` j `tensor` i
-yik = scale (1/2) $ symm $ i `tensor` i `tensor` k
-yki = scale (1/2) $ symm $ k `tensor` k `tensor` i
-yjk = scale (1/2) $ symm $ j `tensor` j `tensor` k
-ykj = scale (1/2) $ symm $ k `tensor` k `tensor` j
+yei = makey e i ; yie = makey i e
+yej = makey e j ; yje = makey j e
+yek = makey e k ; yke = makey k e
+yij = makey i j ; yji = makey j i
+yik = makey i k ; yki = makey k i
+yjk = makey j k ; ykj = makey k j
 
+yijk, yeij, yeik, yejk, yeee, yiii, yjjj, ykkk :: T HHH
+yijk = symm $ i `tensor` j `tensor` k
+yeij = symm $ e `tensor` i `tensor` j
+yeik = symm $ e `tensor` i `tensor` k
+yejk = symm $ e `tensor` j `tensor` k
+yeee = e `tensor` e `tensor` e
+yiii = i `tensor` i `tensor` i
+yjjj = j `tensor` j `tensor` j
+ykkk = k `tensor` k `tensor` k
 
 --------------------------------------------------------------------------------
 -- 1/3 (2 - sig - sig^2)
