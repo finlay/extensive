@@ -46,6 +46,7 @@ showMap combine transform = do
       hs = elements :: [H]
   mapM_ (putStrLn . showLine) [ (x,y) | x <- hs, y <- hs]
 
+
 showBr :: IO ()
 showBr = showMap (\x -> \y -> return (Tensor x y) :: T (Tensor H H)) br
 
@@ -78,6 +79,14 @@ main = do
   showBr
   putStrLn "Inverse Brauer map"
   showInvBr
+
+showMap' :: (Show z, Show w) => (z -> w) -> [z] -> IO ()
+showMap' transform zs = do
+  let showLine z = show z ++ "  -->  " ++ show (transform z)
+  mapM_ (putStrLn . showLine) zs
+
+showBrDualTau :: [T Tau] -> IO ()
+showBrDualTau = showMap' (injectTauInv . toDual . br . injectTau)
 
 
 -- Show all full algebra of H Tensor H
