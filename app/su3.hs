@@ -115,6 +115,117 @@ instance Multiplicative (T Y) where
     (*) x' y' = injectYInv ((injectY x') * (injectY y'))
 
 
+-- YA - six dimensional Lie sub-algebra
+yeei, yjjj, yjjk, ykkj, ykkk :: T Y
+yiii :: T Y
+yeei = return $ Y E E I
+yjjj = return $ Y J J J
+yjjk = return $ Y J J K
+ykkj = return $ Y K K J
+ykkk = return $ Y K K K
+yiii = return $ Y I I I
+
+ya :: [ T Y ]
+ya = [ yeei, yiii, yjjj + ykkk, yjjj - ykkk, yjjk + ykkj, yjjk - ykkj ]
+
+
+-- YB - six dimensional Lie sub-algebra
+yeej, yiik, ykki :: T Y
+yeej = return $ Y E E J
+yiik = return $ Y I I K
+ykki = return $ Y K K I
+
+yb :: [ T Y ]
+yb = [ yeej, yjjj, ykkk + yiii, ykkk - yiii, yiik + ykki, yiik - ykki ]
+
+
+-- YC - six dimensional Lie sub-algebra
+yeek, yiij, yjji :: T Y
+yeek = return $ Y E E K
+yiij = return $ Y I I J
+yjji = return $ Y J J I
+
+yc :: [ T Y ]
+yc = [ yeek, ykkk, yiii + yjjj, yiii - yjjj, yiij + yjji, yiij - yjji ]
+
+-- YA, YB, and YC are all the same sub algebra. All have dimension six
+-- What next ?
+
+yeex :: [ T Y ]
+yeex = [ yeei, yeej, yeek ]  -- Isomorphic to so3
+
+yxxx :: [ T Y ]
+yxxx = [ yiii, yjjj, ykkk ]  -- Isomorphic to so3
+
+yxxy :: [ T Y ]
+yxxy = [ yeei, yiij, yiik ]  -- Isomorphic to so3
+
+yxxz :: [ T Y ]
+yxxz = [ yeej, yjji, yjjk ]  -- Isomorphic to so3
+
+yxxw :: [ T Y ]
+yxxw = [ yeek, ykki, ykkj ]  -- Isomorphic to so3
+
+yaab :: [ T Y ]
+yaab = [ yiij, yjjk, ykki ]  -- Isomorphic to so3
+
+ybba :: [ T Y ]
+ybba = [ yiik, ykkj, yjji ]  -- Isomorphic to so3
+
+
+
+yjje, ykke, yejk, yijk, yiie :: T Y
+yjje = return $ Y J J E
+ykke = return $ Y K K E
+yejk = return $ Y E J K
+yijk = return $ Y I J K
+yiie = return $ Y I I E
+
+-- These four are isomorphic *three* dimensional sub-algebras
+-- What are these Lie algebras?
+
+yabc :: [ T Y ]
+yabc = [ yeei - ykki, yeei - yjji, yjji - ykki, yijk ]
+
+ycab :: [ T Y ]
+ycab = [ yeej - ykkj, yeej - yiij, ykkj - yiij, yijk ]
+
+ybca :: [ T Y ]
+ybca = [ yeek - yjjk, yeek - yiik, yjjk - yiik, yijk ]
+
+yxxe :: [ T Y ]
+yxxe = [ yjje - ykke, yiie - ykke, yiie - yjje, yijk ]
+
+
+---------------------------
+-- These three are isomorphic *five* dimensional sub-algebras
+
+yeij, yeik :: T Y
+yeij = return $ Y E I J
+yeik = return $ Y E I K
+
+yzzy :: [ T Y ]
+yzzy = [ yiii + yeei, yiii - yeei, yeij + yeik, yeij - yeik, yjji + ykki]
+
+yzzx :: [ T Y ]
+yzzx = [ yjjj + yeej, yjjj - yeej, yeij + yejk, yeij - yejk, yiij + ykkj]
+
+yzzw :: [ T Y ]
+yzzw = [ ykkk + yeek, ykkk - yeek, yeik + yejk, yeik - yejk, yiik + yjjk]
+
+
+
+-- These are isomorphic *six* dimensional
+-- Look like they are Z2 graded over yabc
+
+ywwx :: [ T Y ]
+ywwx = yabc ++ [ yiie - yjje,  yjje - ykke, ykke - yiie, yejk ]
+
+ywwy :: [ T Y ]
+ywwy = ycab ++ [ yiie - ykke,  ykke - yjje, yjje - yiie, yeik ]
+
+ywwz :: [ T Y ]
+ywwz = ybca ++ [ yiie - ykke,  ykke - yjje, yjje - yiie, yeij ]
 
 
 
