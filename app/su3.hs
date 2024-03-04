@@ -8,8 +8,10 @@ import Data.List
 import Numeric.Extensive
 import Numeric.Quaternion
 
+import qualified Text.PrettyPrint.Boxes as Box
 
--- import qualified Text.PrettyPrint.Boxes as Box
+main :: IO ()
+main = putStrLn "Does nothing here"
 
 -- \H\otimes\H\otimes\H
 type HHH = Tensor (Tensor H H) H
@@ -83,7 +85,7 @@ showSymm = do
 
 
 makey :: T H -> T H -> T HHH
-makey x y = scale (1/2) $ symm $ x `tensor` x `tensor` y
+makey x y = scale (1/(2 * sqrt 3)) $ symm $ x `tensor` x `tensor` y
 yei, yie, yej, yje, yek, yke :: T HHH
 yij, yji, yik, yki, yjk, ykj :: T HHH
 yei = makey e i ; yie = makey i e
@@ -102,6 +104,19 @@ yeee = e `tensor` e `tensor` e
 yiii = i `tensor` i `tensor` i
 yjjj = j `tensor` j `tensor` j
 ykkk = k `tensor` k `tensor` k
+
+ys :: NamedElements HHH
+ys = [ ("yei", yei) , ("yej", yej) , ("yek", yek)
+     , ("yie", yie) , ("yje", yje) , ("yke", yke)
+     , ("yij", yij) , ("yjk", yjk) , ("yki", yki)
+     , ("yji", yji) , ("ykj", ykj) , ("yik", yik)
+     , ("yijk", yijk) , ("yeij", yeij) , ("yejk", yejk)
+     , ("yeik", yeik) , ("yeee", yeee) , ("yiii", yiii)
+     , ("yjjj", yjjj) , ("ykkk", ykkk) ]
+
+yes, yis :: [ T HHH ]
+yes = [yei, yej, yek, yie, yje, yke]
+yis = [yjk, yki, yij, ykj, yik, yji]
 
 --------------------------------------------------------------------------------
 -- 1/3 (2 - sig - sig^2)
@@ -130,6 +145,19 @@ showP2 = do
 
 
 
+
+-- Useful function
+
+showComm
+  :: (Eq a, FiniteSet a, Show a)
+  => NamedElements a -> (T a -> T a -> T a) -> [T a] -> [T a] -> IO ()
+showComm nelms com left right  =
+  let col  = Box.vsep 1 Box.right
+      xs   = col ( Box.text "" : [Box.text (expandInto nelms x) | x <- left ])
+      e1xs = [ col ( Box.text (expandInto nelms y) :
+                [ Box.text (expandInto nelms (com x y)) | x <- left ])
+             | y <- right ]
+  in  putStrLn $ Box.render $ Box.hsep 2 Box.bottom ( xs: e1xs)
 
 
 

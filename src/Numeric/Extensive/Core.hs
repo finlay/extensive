@@ -11,6 +11,7 @@ import Control.Monad
 import Control.Applicative ((<|>))
 import GHC.TypeLits
 import Data.Proxy
+import Data.List (intercalate)
 
 import Test.QuickCheck (Arbitrary)
 import qualified Test.QuickCheck as QC
@@ -238,6 +239,24 @@ transpose :: (FiniteSet a, FiniteSet b, Eq a, Eq b)
           => (T a -> T b) -> (T b -> T a)
 transpose lm = dual . (\b -> \a -> let T vb = lm $ return a in vb b) . codual
 
+
+-------------------------------------------------------------------------------
+-- Expand into a set of elements
+
+checkForOrtho :: (FiniteSet a, Eq a) => [ T a] -> R
+checkForOrtho elms = sum [ dot a b | a <- elms, b <- elms, a /= b]
+
+type NamedElements a = [(String, T a)]
+expandInto :: Eq a => NamedElements a -> T a -> String
+expandInto nElems a
+  = intercalate " "
+           [ show (dot a b) <> " " <> n
+           | (n, b) <- nElems
+           , dot a b /= 0.0 ]
+
+
+-------------------------------------------------------------------------------
+-- QuickCheck instances
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (Tensor a b) where
     arbitrary = Tensor <$> QC.arbitrary <*> QC.arbitrary
