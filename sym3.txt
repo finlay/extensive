@@ -1,0 +1,381 @@
+[  + Yiii,  + Yjjj ] =  + 12Ykkk
+[  + Yiii,  + Ykkk ] =  - 12Yjjj
+
+[  + Yiii,  + Yeej ] =  + 12Yiik
+[  + Yiii,  + Yiik ] =  - 12Yeej
+
+[  + Yiii,  + Yeek ] =  - 12Yiij
+[  + Yiii,  + Yiij ] =  + 12Yeek
+
+[  + Yiii,  + Yjjk ] =  - 12Ykkj
+[  + Yiii,  + Ykkj ] =  + 12Yjjk
+
+[  + Yiii,  + Yeij ] =  - 12Yeik
+[  + Yiii,  + Yeik ] =  + 12Yeij
+
+
+[  + Yjjj,  + Yiii ] =  - 12Ykkk
+[  + Yjjj,  + Ykkk ] =  + 12Yiii
+
+[  + Yjjj,  + Yeei ] =  - 12Yjjk
+[  + Yjjj,  + Yjjk ] =  + 12Yeei
+
+[  + Yjjj,  + Yeek ] =  + 12Yjji
+[  + Yjjj,  + Yjji ] =  - 12Yeek
+
+[  + Yjjj,  + Yiik ] =  + 12Ykki
+[  + Yjjj,  + Ykki ] =  - 12Yiik
+
+[  + Yjjj,  + Yeij ] =  + 12Yejk
+[  + Yjjj,  + Yejk ] =  - 12Yeij
+
+
+[  + Ykkk,  + Yiii ] =  + 12Yjjj
+[  + Ykkk,  + Yjjj ] =  - 12Yiii
+
+[  + Ykkk,  + Yeei ] =  + 12Ykkj
+[  + Ykkk,  + Ykkj ] =  - 12Yeei
+
+[  + Ykkk,  + Yeej ] =  - 12Ykki
+[  + Ykkk,  + Ykki ] =  + 12Yeej
+
+[  + Ykkk,  + Yiij ] =  - 12Yjji
+[  + Ykkk,  + Yjji ] =  + 12Yiij
+
+[  + Ykkk,  + Yeik ] =  - 12Yejk
+[  + Ykkk,  + Yejk ] =  + 12Yeik
+
+
+[  + Yeei,  + Yjjj ] =  + 12Yjjk
+[  + Yeei,  + Yjjk ] =  - 4Yjjj + 8Ykkj
+[  + Yeei,  + Ykkj ] =  + 4Ykkk - 8Yjjk
+[  + Yeei,  + Ykkk ] =  - 12Ykkj
+
+[  + Yeei,  + Yeej ] =  + 4Yeek
+[  + Yeei,  + Yeek ] =  - 4Yeej
+
+[  + Yeei,  + Yiij ] =  + 4Yiik
+[  + Yeei,  + Yiik ] =  - 4Yiij
+
+[  + Yeei,  + Yjje ] =  + 8Yejk
+[  + Yeei,  + Yejk ] =  - 4Yjje + 4Ykke
+[  + Yeei,  + Ykke ] =  - 8Yejk
+
+[  + Yeei,  + Yjji ] =  + 8Yijk
+[  + Yeei,  + Yijk ] =  - 4Yjji + 4Ykki
+[  + Yeei,  + Ykki ] =  - 8Yijk
+
+[  + Yeei,  + Yeij ] =  + 4Yeik
+[  + Yeei,  + Yeik ] =  - 4Yeij
+
+
+[  + Yeej,  + Yiii ] =  - 12Yiik
+[  + Yeej,  + Yiik ] =  + 4Yiii - 8Ykki
+[  + Yeej,  + Ykki ] =  - 4Ykkk + 8Yiik
+[  + Yeej,  + Ykkk ] =  + 12Ykki
+
+[  + Yeej,  + Yeei ] =  - 4Yeek
+[  + Yeej,  + Yeek ] =  + 4Yeei
+
+[  + Yeej,  + Yiie ] =  - 8Yeik
+[  + Yeej,  + Yeik ] =  + 4Yiie - 4Ykke
+[  + Yeej,  + Ykke ] =  + 8Yeik
+
+[  + Yeej,  + Yiij ] =  - 8Yijk
+[  + Yeej,  + Yijk ] =  + 4Yiij - 4Ykkj
+[  + Yeej,  + Ykkj ] =  + 8Yijk
+
+[  + Yeej,  + Yjji ] =  - 4Yjjk
+[  + Yeej,  + Yjjk ] =  + 4Yjji
+
+[  + Yeej,  + Yeij ] =  - 4Yejk
+[  + Yeej,  + Yejk ] =  + 4Yeij
+
+
+[  + Yeek,  + Yiii ] =  + 12Yiij
+[  + Yeek,  + Yiij ] =  - 4Yiii + 8Yjji
+[  + Yeek,  + Yjji ] =  + 4Yjjj - 8Yiij
+[  + Yeek,  + Yjjj ] =  - 12Yjji
+
+[  + Yeek,  + Yeei ] =  + 4Yeej
+[  + Yeek,  + Yeej ] =  - 4Yeei
+
+[  + Yeek,  + Yiie ] =  + 8Yeij
+[  + Yeek,  + Yeij ] =  - 4Yiie + 4Yjje
+[  + Yeek,  + Yjje ] =  - 8Yeij
+
+[  + Yeek,  + Yiik ] =  + 8Yijk
+[  + Yeek,  + Yijk ] =  - 4Yiik + 4Yjjk
+[  + Yeek,  + Yjjk ] =  - 8Yijk
+
+[  + Yeek,  + Ykki ] =  + 4Ykkj
+[  + Yeek,  + Ykkj ] =  - 4Ykki
+
+[  + Yeek,  + Yeik ] =  + 4Yejk
+[  + Yeek,  + Yejk ] =  - 4Yeik
+
+
+[  + Yiie,  + Yeej ] =  + 8Yeik
+[  + Yiie,  + Yeij ] =  - 4Yeek + 4Yiik
+[  + Yiie,  + Yeek ] =  - 8Yeij
+
+[  + Yiie,  + Yiij ] =  - 8Yeik
+[  + Yiie,  + Yeik ] =  + 4Yeej - 4Yiij
+[  + Yiie,  + Yiik ] =  + 8Yeij
+
+[  + Yiie,  + Yjje ] =  + 8Yijk
+[  + Yiie,  + Yijk ] =  + 4Yjje - 4Ykke
+[  + Yiie,  + Ykke ] =  - 8Yijk
+
+[  + Yiie,  + Yjji ] =  - 8Yejk
+[  + Yiie,  + Yejk ] =  - 4Yjji + 4Ykki
+[  + Yiie,  + Ykki ] =  + 8Yejk
+
+
+[  + Yiij,  + Yiii ] =  - 12Yeek
+[  + Yiij,  + Yeek ] =  + 4Yiii - 8Yjji
+[  + Yiij,  + Yjji ] =  - 4Ykkk + 8Yeek
+[  + Yiij,  + Ykkk ] =  + 12Yjji
+
+[  + Yiij,  + Yeei ] =  - 4Yiik
+[  + Yiij,  + Yiik ] =  + 4Yeei
+
+[  + Yiij,  + Yeej ] =  + 8Yijk
+[  + Yiij,  + Yijk ] =  - 4Yeej + 4Ykkj
+[  + Yiij,  + Ykkj ] =  - 8Yijk
+
+[  + Yiij,  + Yjjk ] =  + 4Ykki
+[  + Yiij,  + Ykki ] =  - 4Yjjk
+
+[  + Yiij,  + Yiie ] =  + 8Yeik
+[  + Yiij,  + Yeik ] =  - 4Yiie + 4Yjje
+[  + Yiij,  + Yjje ] =  - 8Yeik
+
+[  + Yiij,  + Yeij ] =  - 4Yejk
+[  + Yiij,  + Yejk ] =  + 4Yeij
+
+
+[  + Yiik,  + Yeek ] =  - 8Yijk
+[  + Yiik,  + Yijk ] =  + 4Yeek - 4Yjjk
+[  + Yiik,  + Yjjk ] =  + 8Yijk
+
+[  + Yiik,  + Yiii ] =  + 12Yeej
+[  + Yiik,  + Yeej ] =  - 4Yiii + 8Ykki
+[  + Yiik,  + Ykki ] =  + 4Yjjj - 8Yeej
+[  + Yiik,  + Yjjj ] =  - 12Ykki
+
+[  + Yiik,  + Yeei ] =  + 4Yiij
+[  + Yiik,  + Yiij ] =  - 4Yeei
+
+[  + Yiik,  + Yiie ] =  - 8Yeij
+[  + Yiik,  + Yeij ] =  + 4Yiie - 4Ykke
+[  + Yiik,  + Ykke ] =  + 8Yeij
+
+[  + Yiik,  + Yjji ] =  + 4Ykkj
+[  + Yiik,  + Ykkj ] =  - 4Yjji
+
+[  + Yiik,  + Yeik ] =  + 4Yejk
+[  + Yiik,  + Yejk ] =  - 4Yeik
+
+
+[  + Yjje,  + Yeei ] =  - 8Yejk
+[  + Yjje,  + Yejk ] =  - 4Yeei + 4Yjji
+[  + Yjje,  + Yjji ] =  + 8Yejk
+
+[  + Yjje,  + Yeek ] =  + 8Yeij
+[  + Yjje,  + Yeij ] =  + 4Yeek - 4Yjjk
+[  + Yjje,  + Yjjk ] =  - 8Yeij
+
+[  + Yjje,  + Yiie ] =  - 8Yijk
+[  + Yjje,  + Yijk ] =  - 4Yiie + 4Ykke
+[  + Yjje,  + Ykke ] =  + 8Yijk
+
+[  + Yjje,  + Yiij ] =  + 8Yeik
+[  + Yjje,  + Yeik ] =  + 4Yiij - 4Ykkj
+[  + Yjje,  + Ykkj ] =  - 8Yeik
+
+
+[  + Yjji,  + Yeij ] =  + 4Yeik
+[  + Yjji,  + Yeik ] =  - 4Yeij
+
+[  + Yjji,  + Yjjj ] =  + 12Yeek
+[  + Yjji,  + Yeek ] =  - 4Yjjj + 8Yiij
+[  + Yjji,  + Yiij ] =  + 4Ykkk - 8Yeek
+[  + Yjji,  + Ykkk ] =  - 12Yiij
+
+[  + Yjji,  + Yeei ] =  - 8Yijk
+[  + Yjji,  + Yijk ] =  + 4Yeei - 4Ykki
+[  + Yjji,  + Ykki ] =  + 8Yijk
+
+[  + Yjji,  + Yeej ] =  + 4Yjjk
+[  + Yjji,  + Yjjk ] =  - 4Yeej
+
+[  + Yjji,  + Yiie ] =  + 8Yejk
+[  + Yjji,  + Yejk ] =  - 4Yiie + 4Yjje
+[  + Yjji,  + Yjje ] =  - 8Yejk
+
+[  + Yjji,  + Yiik ] =  - 4Ykkj
+[  + Yjji,  + Ykkj ] =  + 4Yiik
+
+
+[  + Yjjk,  + Yiii ] =  + 12Ykkj
+[  + Yjjk,  + Ykkj ] =  - 4Yiii + 8Yeei
+[  + Yjjk,  + Yeei ] =  + 4Yjjj - 8Ykkj
+[  + Yjjk,  + Yjjj ] =  - 12Yeei
+
+[  + Yjjk,  + Yeej ] =  - 4Yjji
+[  + Yjjk,  + Yjji ] =  + 4Yeej
+
+[  + Yjjk,  + Yeek ] =  + 8Yijk
+[  + Yjjk,  + Yijk ] =  - 4Yeek + 4Yiik
+[  + Yjjk,  + Yiik ] =  - 8Yijk
+
+[  + Yjjk,  + Yiij ] =  - 4Ykki
+[  + Yjjk,  + Ykki ] =  + 4Yiij
+
+[  + Yjjk,  + Yjje ] =  + 8Yeij
+[  + Yjjk,  + Yeij ] =  - 4Yjje + 4Ykke
+[  + Yjjk,  + Ykke ] =  - 8Yeij
+
+[  + Yjjk,  + Yeik ] =  + 4Yejk
+[  + Yjjk,  + Yejk ] =  - 4Yeik
+
+
+[  + Ykke,  + Yeei ] =  + 8Yejk
+[  + Ykke,  + Yejk ] =  + 4Yeei - 4Ykki
+[  + Ykke,  + Ykki ] =  - 8Yejk
+
+[  + Ykke,  + Yeej ] =  - 8Yeik
+[  + Ykke,  + Yeik ] =  - 4Yeej + 4Ykkj
+[  + Ykke,  + Ykkj ] =  + 8Yeik
+
+[  + Ykke,  + Yiie ] =  + 8Yijk
+[  + Ykke,  + Yijk ] =  + 4Yiie - 4Yjje
+[  + Ykke,  + Yjje ] =  - 8Yijk
+
+[  + Ykke,  + Yiik ] =  - 8Yeij
+[  + Ykke,  + Yeij ] =  - 4Yiik + 4Yjjk
+[  + Ykke,  + Yjjk ] =  + 8Yeij
+
+
+[  + Ykki,  + Ykkk ] =  - 12Yeej
+[  + Ykki,  + Yeej ] =  + 4Ykkk - 8Yiik
+[  + Ykki,  + Yiik ] =  - 4Yjjj + 8Yeej
+[  + Ykki,  + Yjjj ] =  + 12Yiik
+
+[  + Ykki,  + Yeei ] =  + 8Yijk
+[  + Ykki,  + Yijk ] =  - 4Yeei + 4Yjji
+[  + Ykki,  + Yjji ] =  - 8Yijk
+
+[  + Ykki,  + Yeek ] =  - 4Ykkj
+[  + Ykki,  + Ykkj ] =  + 4Yeek
+
+[  + Ykki,  + Yiie ] =  - 8Yejk
+[  + Ykki,  + Yejk ] =  + 4Yiie - 4Ykke
+[  + Ykki,  + Ykke ] =  + 8Yejk
+
+[  + Ykki,  + Yiij ] =  + 4Yjjk
+[  + Ykki,  + Yjjk ] =  - 4Yiij
+
+[  + Ykki,  + Yeij ] =  + 4Yeik
+[  + Ykki,  + Yeik ] =  - 4Yeij
+
+
+[  + Ykkj,  + Yiii ] =  - 12Yjjk
+[  + Ykkj,  + Yjjk ] =  + 4Yiii - 8Yeei
+[  + Ykkj,  + Yeei ] =  - 4Ykkk + 8Yjjk
+[  + Ykkj,  + Ykkk ] =  + 12Yeei
+
+[  + Ykkj,  + Yeej ] =  - 8Yijk
+[  + Ykkj,  + Yijk ] =  + 4Yeej - 4Yiij
+[  + Ykkj,  + Yiij ] =  + 8Yijk
+
+[  + Ykkj,  + Ykke ] =  - 8Yeik
+[  + Ykkj,  + Yeik ] =  - 4Yjje + 4Ykke
+[  + Ykkj,  + Yjje ] =  + 8Yeik
+
+[  + Ykkj,  + Yeek ] =  + 4Ykki
+[  + Ykkj,  + Ykki ] =  - 4Yeek
+
+[  + Ykkj,  + Yiik ] =  + 4Yjji
+[  + Ykkj,  + Yjji ] =  - 4Yiik
+
+[  + Ykkj,  + Yeij ] =  - 4Yejk
+[  + Ykkj,  + Yejk ] =  + 4Yeij
+
+
+[  + Yeij,  + Yiii ] =  + 12Yeik
+[  + Yeij,  + Yeik ] =  + 2Yiii - 2Yeei - 2Yjji - 2Ykki
+[  + Yeij,  + Yeei ] =  - 4Yeik
+[  + Yeij,  + Yjji ] =  - 4Yeik
+[  + Yeij,  + Ykki ] =  - 4Yeik
+
+[  + Yeij,  + Yjjj ] =  - 12Yejk
+[  + Yeij,  + Yejk ] =  - 2Yjjj + 2Yeej + 2Yiij + 2Ykkj
+[  + Yeij,  + Yeej ] =  + 4Yejk
+[  + Yeij,  + Yiij ] =  + 4Yejk
+[  + Yeij,  + Ykkj ] =  + 4Yejk
+
+[  + Yeij,  + Yeek ] =  + 4Yiie - 4Yjje
+[  + Yeij,  + Yiie ] =  + 4Yeek - 4Yiik
+[  + Yeij,  + Yiik ] =  - 4Yiie + 4Ykke
+[  + Yeij,  + Yjje ] =  - 4Yeek + 4Yjjk
+[  + Yeij,  + Yjjk ] =  + 4Yjje - 4Ykke
+[  + Yeij,  + Ykke ] =  + 4Yiik - 4Yjjk
+
+
+[  + Yeik,  + Yiii ] =  - 12Yeij
+[  + Yeik,  + Yeij ] =  - 2Yiii + 2Yeei + 2Yjji + 2Ykki
+[  + Yeik,  + Yeei ] =  + 4Yeij
+[  + Yeik,  + Yjji ] =  + 4Yeij
+[  + Yeik,  + Ykki ] =  + 4Yeij
+
+[  + Yeik,  + Ykkk ] =  + 12Yejk
+[  + Yeik,  + Yejk ] =  + 2Ykkk - 2Yeek - 2Yiik - 2Yjjk
+[  + Yeik,  + Yeek ] =  - 4Yejk
+[  + Yeik,  + Yiik ] =  - 4Yejk
+[  + Yeik,  + Yjjk ] =  - 4Yejk
+
+[  + Yeik,  + Yeej ] =  - 4Yiie + 4Ykke
+[  + Yeik,  + Yiie ] =  - 4Yeej + 4Yiij
+[  + Yeik,  + Yiij ] =  + 4Yiie - 4Yjje
+[  + Yeik,  + Yjje ] =  - 4Yiij + 4Ykkj
+[  + Yeik,  + Ykke ] =  + 4Yeej - 4Ykkj
+[  + Yeik,  + Ykkj ] =  + 4Yjje - 4Ykke
+
+
+[  + Yejk,  + Yjjj ] =  + 12Yeij
+[  + Yejk,  + Yeij ] =  + 2Yjjj - 2Yeej - 2Yiij - 2Ykkj
+[  + Yejk,  + Yeej ] =  - 4Yeij
+[  + Yejk,  + Yiij ] =  - 4Yeij
+[  + Yejk,  + Ykkj ] =  - 4Yeij
+
+[  + Yejk,  + Ykkk ] =  - 12Yeik
+[  + Yejk,  + Yeik ] =  - 2Ykkk + 2Yeek + 2Yiik + 2Yjjk
+[  + Yejk,  + Yeek ] =  + 4Yeik
+[  + Yejk,  + Yiik ] =  + 4Yeik
+[  + Yejk,  + Yjjk ] =  + 4Yeik
+
+[  + Yejk,  + Yeei ] =  + 4Yjje - 4Ykke
+[  + Yejk,  + Yjje ] =  + 4Yeei - 4Yjji
+[  + Yejk,  + Yjji ] =  + 4Yiie - 4Yjje
+[  + Yejk,  + Yiie ] =  + 4Yjji - 4Ykki
+[  + Yejk,  + Ykki ] =  - 4Yiie + 4Ykke
+[  + Yejk,  + Ykke ] =  - 4Yeei + 4Ykki
+
+
+[  + Yijk,  + Yeei ] =  + 4Yjji - 4Ykki
+[  + Yijk,  + Yjji ] =  - 4Yeei + 4Ykki
+[  + Yijk,  + Ykki ] =  + 4Yeei - 4Yjji
+
+[  + Yijk,  + Yeej ] =  - 4Yiij + 4Ykkj
+[  + Yijk,  + Yiij ] =  + 4Yeej - 4Ykkj
+[  + Yijk,  + Ykkj ] =  - 4Yeej + 4Yiij
+
+[  + Yijk,  + Yeek ] =  + 4Yiik - 4Yjjk
+[  + Yijk,  + Yiik ] =  - 4Yeek + 4Yjjk
+[  + Yijk,  + Yjjk ] =  + 4Yeek - 4Yiik
+
+[  + Yijk,  + Yiie ] =  - 4Yjje + 4Ykke
+[  + Yijk,  + Yjje ] =  + 4Yiie - 4Ykke
+[  + Yijk,  + Ykke ] =  - 4Yiie + 4Yjje

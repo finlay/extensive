@@ -2,14 +2,15 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DataKinds #-}
 {-# OPTIONS_GHC -Wno-incomplete-patterns -Wno-orphans -Wno-unused-top-binds #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 
 import Prelude hiding ((+), (-), (*), (^), (/), negate, (>), (<), sum, fromInteger)
 import Data.List
 import Numeric.Extensive
-import Numeric.Quaternion
+import Numeric.Quaternion hiding (X, Y, Z)
 
 
--- import qualified Text.PrettyPrint.Boxes as Box
+import qualified Text.PrettyPrint.Boxes as Box
 
 -- \H\otimes\H\otimes\H
 type HHH = Tensor (Tensor H H) H
@@ -25,9 +26,6 @@ instance Multiplicative (T (Tensor (Tensor H H) H)) where
 
 image :: (T HHH -> T HHH) -> [T HHH]
 image p = [ p x | x <- ehhh ]
-
-sk, sj, si, se :: T HHH
-[sk, sj, si, se] = map (scale (-1)) $  take 4 $  nub $ sort $ image skew
 
 --------------------------------------------------------------------------------
 -- skew symmetric elements
@@ -54,6 +52,8 @@ showSkew :: IO ()
 showSkew = do
   mapM_ putStrLn [ show x <> " -> " <> (show $ skew x) | x <- ehhh]
 
+sk, sj, si, se :: T HHH
+[sk, sj, si, se] = map (scale (-1)) $  take 4 $  nub $ sort $ image skew
 
 --------------------------------------------------------------------------------
 -- symmetric elements
@@ -82,26 +82,41 @@ showSymm = do
   mapM_ putStrLn [ show x <> " -> " <> (show $ symm x) | x <- ehhh]
 
 
-makey :: T H -> T H -> T HHH
-makey x y = scale (1/2) $ symm $ x `tensor` x `tensor` y
-yei, yie, yej, yje, yek, yke :: T HHH
-yij, yji, yik, yki, yjk, ykj :: T HHH
-yei = makey e i ; yie = makey i e
-yej = makey e j ; yje = makey j e
-yek = makey e k ; yke = makey k e
-yij = makey i j ; yji = makey j i
-yik = makey i k ; yki = makey k i
-yjk = makey j k ; ykj = makey k j
+data Y = Y H H H deriving (Ord, Eq)
+instance Order Y where
+    order a b = Just (compare a b)
+instance Show Y where
+    show (Y  a b c) = "Y"++ show a ++ show b ++ show c ++""
 
-yijk, yeij, yeik, yejk, yeee, yiii, yjjj, ykkk :: T HHH
-yijk = symm $ i `tensor` j `tensor` k
-yeij = symm $ e `tensor` i `tensor` j
-yeik = symm $ e `tensor` i `tensor` k
-yejk = symm $ e `tensor` j `tensor` k
-yeee = e `tensor` e `tensor` e
-yiii = i `tensor` i `tensor` i
-yjjj = j `tensor` j `tensor` j
-ykkk = k `tensor` k `tensor` k
+y0,y1,y2 :: [ Y ]
+y0 = [ Y x x x | x <- elements ]
+y1 = [ Y x x y | x <- elements, y <- elements, x /= y ]
+y2 = [ Y x y z | x <- elements, y <- elements, z <- elements, x<y, y<z ]
+
+instance FiniteSet Y where
+    elements =  y0 ++ y1 ++ y2
+
+ys :: [T Y]
+ys = map return elements
+
+injectY :: T Y -> T HHH
+injectY = extend injectY'
+  where
+    injectY' (Y a b c) =
+      let a' = return a
+          b' = return b
+          c' = return c
+      in  symm $ a' `tensor` b' `tensor` c'
+
+injectYInv :: T HHH -> T Y
+injectYInv = force $ inverse injectY
+
+instance Multiplicative (T Y) where
+    (*) x' y' = injectYInv ((injectY x') * (injectY y'))
+
+
+
+
 
 --------------------------------------------------------------------------------
 -- 1/3 (2 - sig - sig^2)
@@ -127,6 +142,18 @@ showP2 :: IO ()
 showP2 = do
   mapM_ putStrLn [ show x <> " -> " <> (show $ p2 x) | x <- ehhh]
 
+
+
+
+
+
+
+showComm :: (Show a) => (a -> a -> a) -> [a] -> [a] -> IO ()
+showComm com left right  =
+  let col  = Box.vsep 1 Box.right
+      xs   = col ( Box.text "" : [Box.text (show x) | x <- left ])
+      e1xs = [ col ( Box.text (show y) : [Box.text (show (com x y)) | x <- left ]) | y <- right ]
+  in  putStrLn $ Box.render $ Box.hsep 2 Box.bottom ( xs: e1xs)
 
 
 
