@@ -214,6 +214,70 @@ yzzw :: [ T Y ]
 yzzw = [ ykkk + yeek, ykkk - yeek, yeik + yejk, yeik - yejk, yiik + yjjk]
 
 
+-- Try and work this out more abstractly.
+data YF = Ap | Am | Bp | Bm | C deriving (Ord, Eq)
+instance Order YF where
+    order a b = Just (compare a b)
+instance Show YF where
+    show Ap = "A\x207A"
+    show Am = "A\x207B"
+    show Bp = "B\x207A"
+    show Bm = "B\x207B"
+    show C  = "C"
+
+instance FiniteSet YF where
+    elements =  [ Ap, Am, Bp, Bm, C ]
+
+yf :: [ T YF ]
+yf = map return elements
+
+muTYF :: T (Tensor YF YF) -> T YF
+muTYF = extend muTYF'
+ where
+    muTYF' (Tensor Bp Ap) = scale ( -8) (return Bm)
+    muTYF' (Tensor Ap Bp) = scale (  8) (return Bm)
+
+    muTYF' (Tensor Bm Ap) = scale (  8) (return Bp)
+    muTYF' (Tensor Ap Bm) = scale ( -8) (return Bp)
+
+    muTYF' (Tensor Bp Am) = scale (-16) (return Bm)
+    muTYF' (Tensor Am Bp) = scale ( 16) (return Bm)
+
+    muTYF' (Tensor Bm Am) = scale ( 16) (return Bp)
+    muTYF' (Tensor Am Bm) = scale (-16) (return Bp)
+
+    muTYF' (Tensor Bm Bp) = scale (  4) (return Am) + scale ( -4) (return C)
+    muTYF' (Tensor Bp Bm) = scale ( -4) (return Am) + scale (  4) (return C)
+
+    muTYF' (Tensor C  Bp) = scale ( -8) (return Bm)
+    muTYF' (Tensor Bp C ) = scale (  8) (return Bm)
+
+    muTYF' (Tensor C  Bm) = scale (  8) (return Bp)
+    muTYF' (Tensor Bm C ) = scale ( -8) (return Bp)
+    muTYF' (Tensor _  _ ) = zero
+
+instance Multiplicative (T YF) where
+    (*) a b = muTYF $ a `tensor` b
+
+bracket :: T YF -> T YF -> T YF
+bracket = (*)
+
+
+check_sym :: IO ()
+check_sym = mapM_ (putStrLn . show) [ bracket a b + bracket b a | a <- yf, b <- yf ]
+check_jac :: IO ()
+check_jac = mapM_ (putStrLn . show) [ bracket (bracket a b) c
+                                    + bracket (bracket b c) a
+                                    + bracket (bracket c a) b
+                                    | a <- yf, b <- yf, c <- yf
+                                    ]
+
+yf_1 :: [ T YF ]
+yf_1 = [ return Bp, return Bm, return Am - return C ]
+
+-- Turns out that yf_1 ~ so3. So five dimensions = so3 + R + R
+
+
 
 -- These are isomorphic *six* dimensional
 -- Look like they are Z2 graded over yabc
