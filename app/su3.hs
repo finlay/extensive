@@ -27,6 +27,29 @@ instance Multiplicative (T (Tensor (Tensor H H) H)) where
 image :: (T HHH -> T HHH) -> [T HHH]
 image p = [ p x | x <- ehhh ]
 
+
+derivedSeries :: [ T HHH ]
+derivedSeries
+ = let combinations = [ comm a b | a <- basis, b <- basis ]
+   in  reduceSet combinations
+
+reduceSet :: (Eq a, FiniteSet a) => [ T a ] -> [ T a]
+reduceSet set
+ = let go :: (Eq a, FiniteSet a) => [ T a ] -> [ T a ] -> [ T a ]
+       go rset [] = rset
+       go rset (a:as) = if a == zero
+                         then go rset as
+                         else go (reduceTest rset a) as
+       reduceTest :: (Eq a, FiniteSet a) => [ T a ] -> T a -> [ T a ]
+       reduceTest [] a = [ a ]
+       reduceTest rset a = let a' = a - foldl1 (+) [ scale ((dot a b) / sqrt (dot b b)) b | b <- rset ]
+                           in  if a' == zero
+                                  then rset
+                                  else a':rset
+
+   in  go [] set
+
+
 --------------------------------------------------------------------------------
 -- skew symmetric elements
 skew :: T HHH -> T HHH
