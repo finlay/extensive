@@ -102,12 +102,12 @@ showHTH2 = do
   mapM_ (putStrLn . showLine) [ (x, y) | x <- tau, y <- tau ]
 
 
-showcomm :: (show a) => (a -> a -> a) -> [a] -> [a] -> io ()
+showcomm :: (Show a) => (a -> a -> a) -> [a] -> [a] -> IO ()
 showcomm com left right  =
-  let col  = box.vsep 1 box.right
-      xs   = col ( box.text "" : [box.text (show x) | x <- left ])
-      e1xs = [ col ( box.text (show y) : [box.text (show (com x y)) | x <- left ]) | y <- right ]
-  in  putstrln $ box.render $ box.hsep 2 box.bottom ( xs: e1xs)
+  let col  = Box.vsep 1 Box.right
+      xs   = col ( Box.text "" : [Box.text (show x) | x <- left ])
+      e1xs = [ col ( Box.text (show y) : [Box.text (show (com x y)) | x <- left ]) | y <- right ]
+  in  putStrLn $ Box.render $ Box.hsep 2 Box.bottom ( xs: e1xs)
 
 
 
