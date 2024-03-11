@@ -2,6 +2,8 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Numeric.Extensive.Print where
 
+import Data.List (find)
+
 import Text.PrettyPrint.Boxes
 import Text.Printf
 
@@ -12,19 +14,19 @@ showInBasis :: (Show b, Eq b) => [b] -> T b -> String
 showInBasis bs v =
         let coef (T v') = v' . delta
             pairs = [ (e, coef v e) | e <- bs ]
-            showPair (b, n) 
+            showPair (b, n)
                | n == " + 1" = " + "  ++ show b
                | n == " - 1" = " - "  ++ show b
                | otherwise   = n      ++ show b
-            showN (b, n') = 
+            showN (b, n') =
                 let --n = (read $ printf "%0.5f" n' ) :: Double
                     n = n'
                     rn = round n :: Integer
                     i = n == fromInteger rn
                     sgn = if n > 0 then " + " else " - "
-                    sn = if i then show (abs rn) else show (abs n)
+                    sn = if i then show (abs rn) else showSurds (abs n)
                 in (b, sgn ++ sn)
-        in  case map (showPair . showN) . filter (\(_,n) -> n /= 0.0) $ pairs of 
+        in  case map (showPair . showN) . filter (\(_,n) -> n /= 0.0) $ pairs of
                   [] -> " 0"
                   ss -> concat ss
 
@@ -32,7 +34,7 @@ showInBasis bs v =
 instance (Eq a, FiniteSet a, Show a) => Show (T a) where
     show = showInBasis elements
 
-mkBox :: (FiniteSet a, FiniteSet b, Eq b, Eq a) 
+mkBox :: (FiniteSet a, FiniteSet b, Eq b, Eq a)
       => T (Hom a b) -> Box
 mkBox m = box
       where
@@ -41,8 +43,24 @@ mkBox m = box
         cls = [ vsep 0 right (map (ts . snd) (coefficients (apply m e'))) | e' <- es]
         ts = text . printf "%0.4f"
 
-printMap :: (FiniteSet a, FiniteSet b, Eq b, Eq a) 
+printMap :: (FiniteSet a, FiniteSet b, Eq b, Eq a)
          =>  (T a -> T b) -> IO ()
 printMap  = putStrLn . render . mkBox . hom
 instance (FiniteSet a, FiniteSet b, Eq b, Eq a) => Show (T a -> T b) where
     show = render. mkBox . hom
+
+
+surds :: [(R, String)]
+surds
+  = [ ( sqrt 2, "√2")
+    , ( sqrt 3, "√3")
+    , ( sqrt 5, "√5")
+    , ( 1 /sqrt 5, "1/√5")
+    , ( sqrt 7, "√7")
+    ]
+
+showSurds :: R -> String
+showSurds r
+ = let ms = find (\(s,_) -> (abs (abs r - abs s)) < epsilon) surds
+   in  maybe (printf "%0.6f" r) snd ms
+

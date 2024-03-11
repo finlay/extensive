@@ -5,7 +5,10 @@
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 
 import Prelude hiding ((+), (-), (*), (^), (/), negate, (>), (<), sum, fromInteger)
-import Data.List
+import Data.List (sort, nub)
+import Data.Foldable (foldl')
+import System.Environment (getArgs)
+
 import Numeric.Extensive
 import Numeric.Quaternion hiding (X, Y, Z)
 
@@ -40,14 +43,32 @@ reduceSet set
        go rset (a:as) = if a == zero
                          then go rset as
                          else go (reduceTest rset a) as
+
        reduceTest :: (Eq a, FiniteSet a) => [ T a ] -> T a -> [ T a ]
-       reduceTest [] a = [ a ]
-       reduceTest rset a = let a' = a - foldl1 (+) [ scale ((dot a b) / sqrt (dot b b)) b | b <- rset ]
-                           in  if a' == zero
-                                  then rset
-                                  else a':rset
+       reduceTest [] a = [ normalise a ]
+       reduceTest rset a
+          = let a' = a - foldl' (+) zero [ scale ((dot a b) / sqrt (dot b b)) b | b <- rset ]
+            in  if a' == zero
+                   then rset
+                   else (normalise a'):rset
 
    in  go [] set
+
+
+main :: IO()
+main =
+  let combs :: [ T (Tensor H H) ]
+      combs = [ comm a b | a <- basis, b <- basis ]
+  in  do
+    args <- getArgs
+    case args of
+      n:_ -> do
+        let rshh = reduceSet (take (read n) combs)
+        putStrLn $ "length of reduced set = " ++ (show $ length rshh)
+        mapM_ print rshh
+      _ -> do
+        putStrLn $ "provide number"
+
 
 
 --------------------------------------------------------------------------------

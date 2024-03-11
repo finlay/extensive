@@ -5,6 +5,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE Strict #-}
 module Numeric.Extensive.Core where
 
 import Control.Monad
@@ -17,7 +18,7 @@ import qualified Test.QuickCheck as QC
 
 import Text.Printf
 import Numeric.Algebra
-import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
+import Prelude hiding ((+), (-), (*), (^), (/), negate, (>), (<), sum, fromInteger)
 import qualified Prelude
 
 newtype R = R Double
@@ -200,6 +201,12 @@ instance Show (N n) where
 -- If we have a vector over a finite set, we can calculate the coefficients
 coefficients :: (FiniteSet x, Eq x) => T x -> [(x, R)]
 coefficients (T v) = map (\e -> (e, v (delta e))) elements
+
+
+-- Normalise vector to have length one
+normalise :: Eq a => T a -> T a
+normalise v = scale (1 / (sqrt (dot v v))) v
+
 
 -- Equality instances are only ever approximate.
 --instance (Eq a, FiniteSet a) => Eq (a -> R) where
