@@ -31,10 +31,10 @@ image :: (T HHH -> T HHH) -> [T HHH]
 image p = [ p x | x <- ehhh ]
 
 
-derivedSeries :: [ T HHH ]
-derivedSeries
+derivedSeries :: Int -> [ T HHH ]
+derivedSeries n
  = let combinations = [ comm a b | a <- basis, b <- basis ]
-   in  reduceSet combinations
+   in  reduceSet (take n combinations)
 
 reduceSet :: (Eq a, FiniteSet a) => [ T a ] -> [ T a]
 reduceSet set
