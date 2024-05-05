@@ -10,7 +10,7 @@ import Data.Foldable (foldl')
 import System.Environment (getArgs)
 
 import Numeric.Extensive
-import Numeric.Quaternion hiding (X, Y, Z)
+import Numeric.Quaternion hiding (X, Y, Z, x, y, z)
 
 
 import qualified Text.PrettyPrint.Boxes as Box
@@ -19,6 +19,8 @@ import qualified Text.PrettyPrint.Boxes as Box
 type HHH = Tensor (Tensor H H) H
 ehhh :: [T HHH]
 ehhh = map return elements
+
+
 
 instance Multiplicative (T (Tensor (Tensor H H) H)) where
     (*) x' y' = extend muHHH (x' `tensor` y')
@@ -377,5 +379,65 @@ showComm com left right  =
 
 
 
+rho :: T H -> T (Tensor H H) -> T (Tensor H H)
+rho x = extend (rho' x)
+  where
+    rho' x (a `Tensor` b)
+       = let y = return a
+             z = return b
+         in  scale 0.5 $ (y * x) `tensor` z - (x * y) `tensor` z +
+                          y `tensor` (z * x) - y `tensor` (x * z)
 
+rhot :: T H -> T Tau -> T Tau
+rhot x = injectTauInv . rho x . injectTau
+
+
+showEHH :: T H -> IO ()
+showEHH l =
+  let showres t = (show l) <> " : "  <> (show t)
+                           <> " -> " <> (show $ rhot l t)
+  in  mapM_ (putStrLn . showres) (map return (sym0 ++ sym2))
+
+ee, ii, jj, kk :: T Tau
+[ee, ii, jj, kk] = map return sym0
+ij, jk, ki :: T Tau
+[ij, jk, ki] = map return sym2
+
+data R5 = IJ | JK | KI | X5 | Y5 deriving (Ord, Eq)
+instance Order R5 where
+    order a b = Just (compare a b)
+instance Show R5 where
+    show IJ = "i \x2228 j"
+    show JK = "j \x2228 k"
+    show KI = "k \x2228 i"
+    show X5 = "x"
+    show Y5 = "y"
+
+instance FiniteSet R5 where
+    elements = [ KI, JK, X5, IJ, Y5 ]
+
+r5 :: [T R5]
+r5 = map return elements
+
+injectR5 :: T R5 -> T Tau
+injectR5 = extend injectR5'
+  where
+    injectR5' IJ = ij
+    injectR5' JK = jk
+    injectR5' KI = ki
+    injectR5' X5 = scale (sqrt(1/3)) $ scale (1/2) (ii + jj) - kk
+    injectR5' Y5 = scale (1/2) $ ii - jj
+
+injectR5Inv :: T Tau -> T R5
+injectR5Inv = force $ inverse injectR5
+
+
+rho5 :: T H -> T R5  -> T R5
+rho5 x = injectR5Inv . rhot x . injectR5
+
+showER5 :: T H -> IO ()
+showER5 l =
+  let showres t = (show l) <> " : "  <> (show t)
+                           <> " -> " <> (show $ rho5 l t)
+  in  mapM_ (putStrLn . showres) r5
 

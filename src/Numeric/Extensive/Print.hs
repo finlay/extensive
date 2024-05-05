@@ -18,18 +18,19 @@ showInBasis bs v =
                | n == " + 1" = " + "  ++ show b
                | n == " - 1" = " - "  ++ show b
                | otherwise   = n      ++ show b
-            showN (b, n') =
-                let --n = (read $ printf "%0.5f" n' ) :: Double
-                    n = n'
-                    rn = round n :: Integer
-                    i = n == fromInteger rn
-                    sgn = if n > 0 then " + " else " - "
-                    sn = if i then show (abs rn) else showSurds (abs n)
-                in (b, sgn ++ sn)
         in  case map (showPair . showN) . filter (\(_,n) -> n /= 0.0) $ pairs of
                   [] -> " 0"
                   ss -> concat ss
 
+showN :: (a, R) -> (a, String)
+showN (b, n') =
+    let --n = (read $ printf "%0.5f" n' ) :: Double
+        n = n'
+        rn = round n :: Integer
+        i = n == fromInteger rn
+        sgn = if n > 0 then " + " else " - "
+        sn = if i then show (abs rn) else showSurds (abs n)
+    in (b, sgn ++ sn)
 
 instance (Eq a, FiniteSet a, Show a) => Show (T a) where
     show = showInBasis elements
@@ -40,8 +41,7 @@ mkBox m = box
       where
         es = map return elements
         box = hsep 2 left cls
-        cls = [ vsep 0 right (map (ts . snd) (coefficients (apply m e'))) | e' <- es]
-        ts = text . printf "%0.4f"
+        cls = [ vsep 0 right (map (text . snd . showN) (coefficients (apply m e'))) | e' <- es]
 
 printMap :: (FiniteSet a, FiniteSet b, Eq b, Eq a)
          =>  (T a -> T b) -> IO ()
@@ -52,11 +52,19 @@ instance (FiniteSet a, FiniteSet b, Eq b, Eq a) => Show (T a -> T b) where
 
 surds :: [(R, String)]
 surds
-  = [ ( sqrt 2, "√2")
-    , ( sqrt 3, "√3")
-    , ( sqrt 5, "√5")
-    , ( 1 /sqrt 5, "1/√5")
-    , ( sqrt 7, "√7")
+  = [ ( sqrt 2,         "√2")
+    , ( 2 * sqrt 2,     "2√2")
+    , ( sqrt (1/2),     "1/√2")
+    , ( sqrt 3,         "√3")
+    , ( sqrt (3/2),     "√3/√2")
+    , ( 3 * sqrt (3/2), "3√3/√2")
+    , ( sqrt 3,         "√3")
+    , ( sqrt (1/3),     "1/√3")
+    , ( sqrt (2/3),     "√2/√3")
+    , ( sqrt 5,         "√5")
+    , ( sqrt (1/5),     "1/√5")
+    , ( sqrt 6,         "√3√2")
+    , ( sqrt 7,         "√7")
     ]
 
 showSurds :: R -> String
