@@ -570,4 +570,9 @@ check_jac_su3 els brac =
       okay = (length $ filter (not . is_zero) combinations) == zero
   in  if okay
         then putStrLn "Satisfies the Jacobi identity"
-        else mapM_ (putStrLn . show) $ filter (not . is_zero) combinations
+        else mapM_ (putStrLn . show) $ zip [1::Int ..] $ filter (not . is_zero) combinations
+
+showSU3 :: T SU3 -> IO ()
+showSU3 x
+ = mapM_ putStrLn $ [ show x ++ " : " ++ show y ++ " -> " ++ show (x*y)
+                    | y <- su3 ]

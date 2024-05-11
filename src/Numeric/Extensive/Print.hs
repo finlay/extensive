@@ -17,6 +17,8 @@ showInBasis bs v =
             showPair (b, n)
                | n == " + 1" = " + "  ++ show b
                | n == " - 1" = " - "  ++ show b
+               | n == " - 0" = " 0 "
+               | n == " + 0" = " 0 "
                | otherwise   = n      ++ show b
         in  case map (showPair . showN) . filter (\(_,n) -> n /= 0.0) $ pairs of
                   [] -> " 0"
@@ -53,6 +55,8 @@ instance (FiniteSet a, FiniteSet b, Eq b, Eq a) => Show (T a -> T b) where
 surds :: [(R, String)]
 surds
   = [ ( sqrt 2,         "√2")
+    , ( 0.5,            "1/2")
+    , ( 0.25,           "1/4")
     , ( 2 * sqrt 2,     "2√2")
     , ( sqrt (1/2),     "1/√2")
     , ( sqrt 3,         "√3")
