@@ -30,7 +30,10 @@ showN (b, n') =
         n = n'
         rn = round n :: Integer
         i = n == fromInteger rn
-        sgn = if n > 0 then " + " else " - "
+        sgn
+          | n == 0     = ""
+          | n > 0      = " + "
+          | otherwise  = " - "
         sn = if i then show (abs rn) else showSurds (abs n)
     in (b, sgn ++ sn)
 
