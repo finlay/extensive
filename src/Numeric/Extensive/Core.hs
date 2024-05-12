@@ -13,7 +13,6 @@ import Control.Applicative ((<|>))
 import GHC.TypeLits
 import Data.Proxy
 
-import Test.QuickCheck (Arbitrary)
 import qualified Test.QuickCheck as QC
 
 import Text.Printf
@@ -23,7 +22,7 @@ import qualified Prelude
 
 newtype R = R Double
     deriving (Num, Ord, Fractional,
-              Arbitrary, RealFrac, PrintfArg, Real, Floating)
+              RealFrac, PrintfArg, Real, Floating)
 epsilon :: R
 epsilon = R 1e-6 -- fast and approximate
 
@@ -246,16 +245,21 @@ transpose :: (FiniteSet a, FiniteSet b, Eq a, Eq b)
 transpose lm = dual . (\b -> \a -> let T vb = lm $ return a in vb b) . codual
 
 
-instance (Arbitrary a, Arbitrary b) => Arbitrary (Tensor a b) where
-    arbitrary = Tensor <$> QC.arbitrary <*> QC.arbitrary
+instance {-# OVERLAPPABLE #-} FiniteSet a => QC.Arbitrary a where
+    arbitrary = QC.elements elements
 
-instance (Arbitrary a, Arbitrary b) => Arbitrary (Hom a b) where
-    arbitrary = Hom    <$> QC.arbitrary <*> QC.arbitrary
+--instance (Arbitrary a, Arbitrary b) => Arbitrary (Tensor a b) where
+--    arbitrary = Tensor <$> QC.arbitrary <*> QC.arbitrary
+--
+--instance (Arbitrary a, Arbitrary b) => Arbitrary (Hom a b) where
+--    arbitrary = Hom    <$> QC.arbitrary <*> QC.arbitrary
 
-instance (Arbitrary a) => Arbitrary (T a)
+
+
+instance QC.Arbitrary1 T
   where
-    arbitrary =
+    liftArbitrary as =
       do
-        bs    <- QC.listOf1 QC.arbitrary
-        coefs <- QC.vector (length bs)
+        bs    <- QC.listOf1 $ as
+        coefs <- map R <$> QC.vector (length bs)
         return $ foldl1 plus $ map (\(n,b) -> scale n (return b)) $ zip coefs bs
