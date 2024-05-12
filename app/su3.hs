@@ -446,6 +446,9 @@ showER5 l =
 
 -- We start with a nine dimensional algebra, because it makes more sense (sort of)
 -- Even though the algebra is really eight dimensional
+--
+-- based on https://visuallietheory.blogspot.com/2012/
+-- with some tweaks (see below)
 
 data SU3 = Tx | Ty | Tz | Ux | Uy | Uz | Vx | Vy | Vz deriving (Ord, Eq)
 instance Order SU3 where
@@ -555,7 +558,13 @@ instance Multiplicative (T SU3) where
     (*) x' y' = su3_bracket (x' `tensor` y')
 
 check_sym_su3 :: (Show a, Eq a, FiniteSet a) => [T a] -> (T a -> T a -> T a) -> IO ()
-check_sym_su3 els brac = mapM_ (putStrLn . show) [ brac a b + brac b a | a <- els, b <- els ]
+check_sym_su3 els brac =
+  let combinations =[ (a, b, brac a b + brac b a) | a <- els, b <- els ]
+      is_zero (_,_,r) = r == zero
+      okay = (length $ filter (not . is_zero) combinations) == zero
+  in  if okay
+        then putStrLn "Satisfies the skew symetry identity"
+        else mapM_ (putStrLn . show) $ zip [1::Int ..] $ filter (not . is_zero) combinations
 
 
 jacobi :: Additive t => (t -> t -> t) -> t -> t -> t -> t
