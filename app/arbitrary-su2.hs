@@ -41,3 +41,10 @@ generate_ijk = do
   let k = normalise_so3 (i * j)
 
   return (i, j, k)
+
+main :: IO ()
+main = do
+  (i, j, k) <- generate_ijk
+  putStrLn $ "i = " ++ show i
+  putStrLn $ "j = " ++ show j
+  putStrLn $ "k = " ++ show k

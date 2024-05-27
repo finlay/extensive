@@ -239,6 +239,15 @@ dual x = sum $ map (\e -> scale (x e) (return e)) elements
 dot :: Eq a => T a -> T a -> R
 dot (T y) = y . codual
 
+-- Killing form
+killing :: (FiniteSet a, Eq a) => (T a -> T a -> T a) -> T a -> T a -> R
+killing ad x' y' = trace (ad x' . ad y')
+  where
+    trace f = sum $ map (diag f) elements
+    coef (T v) = v . delta
+    diag f e' = coef (f (return e')) e'
+
+
 -- Transpose
 transpose :: (FiniteSet a, FiniteSet b, Eq a, Eq b)
           => (T a -> T b) -> (T b -> T a)

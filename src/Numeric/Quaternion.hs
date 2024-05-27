@@ -99,14 +99,6 @@ injectTau = extend injectTau'
 injectTauInv :: T (Tensor H H) -> T Tau
 injectTauInv = force $ inverse injectTau
 
--- Killing form
-killing :: (FiniteSet a, Eq a) => (T a -> T a -> T a) -> T a -> T a -> R
-killing ad x' y' = trace (ad x' . ad y')
-  where
-    trace f = sum $ map (diag f) elements
-    coef (T v) = v . delta
-    diag f e' = coef (f (return e')) e'
-
 -- Construct as Lie algebra
 
 -- Define a new set of generators, based on a few basics
