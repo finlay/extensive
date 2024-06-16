@@ -17,7 +17,7 @@ import Numeric.Extensive
 -- based on https://visuallietheory.blogspot.com/2012/
 -- with some tweaks (see below) -- to the right of lines
 
-data SU3 = Tx | Ty | Tz | Ux | Uy | Uz | Vx | Vy | Vz deriving (Ord, Eq)
+data SU3 = Tx | Ty | Tz | Ux | Uy | Uz | Vx | Vy deriving (Ord, Eq)
 instance Order SU3 where
     order a b = Just (compare a b)
 instance Show SU3 where
@@ -29,15 +29,14 @@ instance Show SU3 where
     show Uz = "uz"
     show Vx = "vx"
     show Vy = "vy"
-    show Vz = "vz"
 
 instance FiniteSet SU3 where
-    elements = [ Tx, Ty, Tz, Ux, Uy, Uz, Vx, Vy, Vz ]
+    elements = [ Tx, Ty, Tz, Ux, Uy, Uz, Vx, Vy ]
 
 su3:: [T SU3]
 su3 = map return elements
-tx, ty, tz, ux, uy, uz, vx, vy, vz :: T SU3
-[tx, ty, tz, ux, uy, uz, vx, vy, vz] = su3
+tx, ty, tz, ux, uy, uz, vx, vy :: T SU3
+[tx, ty, tz, ux, uy, uz, vx, vy] = su3
 
 su3_bracket :: T (Tensor SU3 SU3) -> T SU3
 su3_bracket = extend su3_bracket'
@@ -62,10 +61,10 @@ su3_bracket = extend su3_bracket'
 
     su3_bracket' (Tx `Tensor` Vx) = scale (  0.5) uy
     su3_bracket' (Tx `Tensor` Vy) = scale (- 0.5) ux
-    su3_bracket' (Tx `Tensor` Vz) = scale (- 0.5) ty
+    -- su3_bracket' (Tx `Tensor` Vz) = scale (- 0.5) ty
     su3_bracket' (Ty `Tensor` Vx) = scale (  0.5) ux    --- : - -> +
     su3_bracket' (Ty `Tensor` Vy) = scale (  0.5) uy
-    su3_bracket' (Ty `Tensor` Vz) = scale (  0.5) tx
+    -- su3_bracket' (Ty `Tensor` Vz) = scale (  0.5) tx
     su3_bracket' (Tz `Tensor` Vx) = scale (  0.5) vy
     su3_bracket' (Tz `Tensor` Vy) = scale (- 0.5) vx
 
@@ -87,10 +86,10 @@ su3_bracket = extend su3_bracket'
 
     su3_bracket' (Ux `Tensor` Vx) = scale (- 0.5) ty
     su3_bracket' (Ux `Tensor` Vy) = scale (  0.5) tx
-    su3_bracket' (Ux `Tensor` Vz) = scale (- 0.5) uy
+    -- su3_bracket' (Ux `Tensor` Vz) = scale (- 0.5) uy
     su3_bracket' (Uy `Tensor` Vx) = scale (- 0.5) tx
     su3_bracket' (Uy `Tensor` Vy) = scale (- 0.5) ty    --- : + -> -
-    su3_bracket' (Uy `Tensor` Vz) = scale (  0.5) ux
+    -- su3_bracket' (Uy `Tensor` Vz) = scale (  0.5) ux
     su3_bracket' (Uz `Tensor` Vx) = scale (  0.5) vy
     su3_bracket' (Uz `Tensor` Vy) = scale (- 0.5) vx
 
@@ -100,8 +99,8 @@ su3_bracket = extend su3_bracket'
     su3_bracket' (Vy `Tensor` Tx) = scale (  0.5) ux
     su3_bracket' (Vy `Tensor` Ty) = scale (- 0.5) uy
     su3_bracket' (Vy `Tensor` Tz) = scale (  0.5) vx
-    su3_bracket' (Vz `Tensor` Tx) = scale (  0.5) ty
-    su3_bracket' (Vz `Tensor` Ty) = scale (- 0.5) tx
+    -- su3_bracket' (Vz `Tensor` Tx) = scale (  0.5) ty
+    -- su3_bracket' (Vz `Tensor` Ty) = scale (- 0.5) tx
 
     su3_bracket' (Vx `Tensor` Ux) = scale (  0.5) ty
     su3_bracket' (Vx `Tensor` Uy) = scale (  0.5) tx
@@ -109,20 +108,23 @@ su3_bracket = extend su3_bracket'
     su3_bracket' (Vy `Tensor` Ux) = scale (- 0.5) tx
     su3_bracket' (Vy `Tensor` Uy) = scale (  0.5) ty    --- : - -> +
     su3_bracket' (Vy `Tensor` Uz) = scale (  0.5) vx
-    su3_bracket' (Vz `Tensor` Ux) = scale (  0.5) uy
-    su3_bracket' (Vz `Tensor` Uy) = scale (- 0.5) ux
+    -- su3_bracket' (Vz `Tensor` Ux) = scale (  0.5) uy
+    -- su3_bracket' (Vz `Tensor` Uy) = scale (- 0.5) ux
 
-    su3_bracket' (Vx `Tensor` Vy) = vz
-    su3_bracket' (Vy `Tensor` Vx) = minus vz
-    su3_bracket' (Vy `Tensor` Vz) = vx
-    su3_bracket' (Vz `Tensor` Vy) = minus vx
-    su3_bracket' (Vz `Tensor` Vx) = vy
-    su3_bracket' (Vx `Tensor` Vz) = minus vy
+    su3_bracket' (Vx `Tensor` Vy) = (tz + uz) -- vz
+    su3_bracket' (Vy `Tensor` Vx) = minus (tz + uz) -- minus vz
+    -- su3_bracket' (Vy `Tensor` Vz) = vx
+    -- su3_bracket' (Vz `Tensor` Vy) = minus vx
+    -- su3_bracket' (Vz `Tensor` Vx) = vy
+    -- su3_bracket' (Vx `Tensor` Vz) = minus vy
 
     su3_bracket' _ = zero
 
 instance Multiplicative (T SU3) where
     (*) x' y' = su3_bracket (x' `tensor` y')
+
+
+
 
 
 showSU3 :: T SU3 -> IO ()

@@ -1,6 +1,7 @@
 import Prelude hiding ((+), (-), (*), (^), (/), negate, (>), (<), sum, fromInteger)
 
 import qualified Test.QuickCheck as QC
+import qualified Text.PrettyPrint.Boxes as Box
 
 import Numeric.Extensive
 import Numeric.SU3
@@ -41,6 +42,15 @@ generate_su3 = do
   return [i, j, k]
 
 
+showForm :: (T SU3 -> T SU3 -> R) -> IO ()
+showForm form =
+  let col  = Box.vsep 1 Box.right
+      xs   = col ( Box.text "" : [Box.text (show x) | x <- su3 ])
+      e1xs = [ col ( Box.text (show y) : [Box.text (show (form x y)) | x <- su3 ]) | y <- su3 ]
+  in  putStrLn $ Box.render $ Box.hsep 2 Box.bottom ( xs: e1xs)
+
+
+
 main :: IO (T SU3, T SU3, T SU3)
 main = do
   su3_basis <- generate_su3
@@ -53,5 +63,12 @@ main = do
   putStrLn $ "killing i i = -3.0 => " ++ (show $ killing (*) i i == -3.0)
   putStrLn $ "killing j j = -3.0 => " ++ (show $ killing (*) j j == -3.0)
   putStrLn $ "killing k k = -3.0 => " ++ (show $ killing (*) k k == -3.0)
+
+  putStrLn "Euclidean form"
+  showForm dot
+
+  putStrLn "Killing form"
+  showForm (killing (*))
+
   return (i,j,k)
 
