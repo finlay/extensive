@@ -62,7 +62,7 @@ showInvBrDual = showMap (\x -> \y -> scale 4 $ return (Tensor x y) :: T (Tensor 
 -- Show the map Br . Dual in tau basis.
 showBrTau :: IO ()
 showBrTau = do
-  let transform = injectTauInv  . toDual . br . injectTau
+  let transform = injectTauInv . scale 0.5 . toDual . br . injectTau
       showLine xy = show xy ++ "  -->  " ++ show (transform xy)
   mapM_ (putStrLn . showLine) tau
 
@@ -108,6 +108,14 @@ showcomm com left right  =
       xs   = col ( Box.text "" : [Box.text (show x) | x <- left ])
       e1xs = [ col ( Box.text (show y) : [Box.text (show (com x y)) | x <- left ]) | y <- right ]
   in  putStrLn $ Box.render $ Box.hsep 2 Box.bottom ( xs: e1xs)
+
+
+-- Want to calculate what the full differential looks like as a jacobian.
+-- In particular, we want to present in terms of div, curl, grad, etc.
+
+
+
+
 
 
 
