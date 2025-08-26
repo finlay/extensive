@@ -115,10 +115,55 @@ showcomm com left right  =
 
 
 
+br2 :: T (Tensor (Tensor H H) H) -> T (Hom (Tensor H H) H)
+br2 = extend $ hom . br2'
+  where
+    br2'' :: T H -> T H -> T H -> Tensor H H -> T H
+    br2'' tx ty tz (Tensor u v)  = let tu = return u
+                                       tv = return v
+                                   in tx * tu * ty * tv * tz
+    br2' :: Tensor (Tensor H H) H -> T (Tensor H H) -> T H
+    br2' (Tensor (Tensor x y) z) = let tx = return x
+                                       ty = return y
+                                       tz = return z
+                                   in  extend (br2'' tx ty tz)
 
 
+invbr2 :: T (Hom (Tensor H H) H) -> T (Tensor (Tensor H H) H)
+invbr2 = inverse br2
+
+showMap2 :: (Show z, Show w) => (H -> H -> H -> z) -> (z -> w) -> IO ()
+showMap2 combine transform = do
+  let showLine (x, y, z) =
+         let xyz = combine x y z
+         in  show xyz ++ "  -->  " ++ show (transform xyz)
+      hs = elements :: [H]
+  mapM_ (putStrLn . showLine) [ (x,y,z) | x <- hs, y <- hs, z <- hs]
+
+mk3 :: R -> H -> H -> H -> T (Tensor (Tensor H H) H)
+mk3 r x y z = scale r $ return (Tensor (Tensor x y) z) :: T (Tensor (Tensor H H) H)
+
+showBr2 :: IO ()
+showBr2 = showMap2 (mk3 1.0) br2
+
+showInvBr2 :: IO ()
+showInvBr2 = showMap2 (\x -> \y -> \z -> scale 16 $ return (Hom (Tensor x y) z) :: T (Hom (Tensor H H) H)) invbr2
 
 
+tau2 :: T (Hom (Tensor H H) H) -> T (Hom (Tensor H H) H)
+tau2 = extend tau2'
+  where
+    tau2' :: Hom (Tensor H H) H -> T (Hom (Tensor H H) H)
+    tau2' (Hom (Tensor x y) z) = return (Hom (Tensor y x) z)
+
+taut :: T (Tensor (Tensor H H) H) -> T (Tensor (Tensor H H) H)
+taut = invbr2 . tau2 . br2
+
+showBrTau2 :: IO ()
+showBrTau2 = showMap2 (mk3 4) taut
+
+mul2 :: T (Tensor (Tensor H H) H) -> T H
+mul2 = extend $ \(Tensor (Tensor x y) z) -> return x * return y * return z
 
 
 
