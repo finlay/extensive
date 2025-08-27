@@ -166,4 +166,65 @@ mul2 :: T (Tensor (Tensor H H) H) -> T H
 mul2 = extend $ \(Tensor (Tensor x y) z) -> return x * return y * return z
 
 
+sset :: [ T ( Tensor (Tensor H H) H) ]
+sset =
+  let hs = [e, i, j, k]
+  in  [ a `tensor` b `tensor` c
+      | a <- hs, b <- hs, c <- hs
+      , a * b * c == e || a * b * c == scale (-1) e
+      ]
+
+showSSET :: IO ()
+showSSET = do
+  let showLine x = show x ++ " --> " ++ show (taut x)
+  mapM_ (putStrLn . showLine) [scale 4 x | x <- sset]
+
+
+-- Diagonalise taut
+--
+-- Remember that taut . taut = Id. It is idempotent.
+-- The two eiganspaces of taut, which are defined by (Id - taut) and (Id + taut)
+-- correspond to the anti-symmetric and symmetric parts of the first two factors
+-- in H* ⊗ H* ⊗ H. The anti-symmetric part maps to Ω²(H), which has dimension 24.
+--
+-- The subset sset has 16 elements, or a 1/4 of the whole of H³. The implication
+-- is that the image of (Id - taut) should have dimension 24/4 = 6.
+-- Lets find those six dimensions.
+
+i3, j3, k3 :: T (Tensor (Tensor H H) H)
+i3 = i ⊗ i ⊗ e + i ⊗ e ⊗ i + e ⊗ i ⊗ i
+j3 = j ⊗ j ⊗ e + j ⊗ e ⊗ j + e ⊗ j ⊗ j
+k3 = k ⊗ k ⊗ e + k ⊗ e ⊗ k + e ⊗ k ⊗ k
+
+ijk, kji :: T (Tensor (Tensor H H) H)
+ijk = i ⊗ j ⊗ k + j ⊗ k ⊗ i + k ⊗ i ⊗ j
+kji = i ⊗ k ⊗ j + j ⊗ i ⊗ k + k ⊗ j ⊗ i
+
+-- Turns out that
+-- i3 - j3, j3 - k3, and k3 - i3 are all in the kernel of (id - taut)
+-- This accounts for a 2 dimensional space.
+-- Also, ijk + kji is in the kernel, accounting for 1 more dimension. (three to go)
+--
+-- (id - taut) $ (scale 3 $ ijk - kji) + (scale 2 $ i3 + j3 + k3) == 0
+-- + 2e ⊗ i ⊗ i + 2i ⊗ i ⊗ e + 2i ⊗ e ⊗ i
+-- + 2e ⊗ j ⊗ j + 2j ⊗ j ⊗ e + 2j ⊗ e ⊗ j
+-- + 2e ⊗ k ⊗ k + 2k ⊗ e ⊗ k + 2k ⊗ k ⊗ e
+-- + 3i ⊗ j ⊗ k + 3j ⊗ k ⊗ i + 3k ⊗ i ⊗ j
+-- - 3i ⊗ k ⊗ j - 3j ⊗ i ⊗ k - 3k ⊗ j ⊗ i
+-- This accounts for one more dimension. two to go!
+
+
+-- hmmm, where to look now...
+e3 :: T (Tensor (Tensor H H) H)
+e3 = e ⊗ e ⊗ e
+
+-- (id - taut) $ (scale 3 e3) - (scale 1 $ i3 + j3 + k3) == 0
+-- + 3e ⊗ e ⊗ e
+-- - e ⊗ i ⊗ i - i ⊗ e ⊗ i - i ⊗ i ⊗ e
+-- - e ⊗ j ⊗ j - j ⊗ e ⊗ j - j ⊗ j ⊗ e
+-- - e ⊗ k ⊗ k - k ⊗ e ⊗ k - k ⊗ k ⊗ e
+-- One more dimesion down, one to go.
+
+
+
 

@@ -137,6 +137,8 @@ iadj :: (T (Tensor a b) -> T c) -> T a -> T b -> T c
 -- iadj g x y = g (x ⊗ y)
 iadj g va vb = g (va `tensor` vb)
 
+(⊗) :: T a -> T b -> T (Tensor a b)
+(⊗) = tensor
 
 -- Hom represent linear maps.
 data Hom a b = Hom a b deriving (Eq, Ord)
