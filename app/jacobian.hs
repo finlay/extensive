@@ -183,7 +183,7 @@ showSSET = do
 -- Diagonalise taut
 --
 -- Remember that taut . taut = Id. It is idempotent.
--- The two eiganspaces of taut, which are defined by (Id - taut) and (Id + taut)
+-- The two eiganspaces of taut, which are defined by (id + taut) and (id - taut)
 -- correspond to the anti-symmetric and symmetric parts of the first two factors
 -- in H* ⊗ H* ⊗ H. The anti-symmetric part maps to Ω²(H), which has dimension 24.
 --
@@ -200,6 +200,10 @@ ijk, kji :: T (Tensor (Tensor H H) H)
 ijk = i ⊗ j ⊗ k + j ⊗ k ⊗ i + k ⊗ i ⊗ j
 kji = i ⊗ k ⊗ j + j ⊗ i ⊗ k + k ⊗ j ⊗ i
 
+e3 :: T (Tensor (Tensor H H) H)
+e3 = e ⊗ e ⊗ e
+
+
 -- Turns out that
 -- i3 - j3, j3 - k3, and k3 - i3 are all in the kernel of (id - taut)
 -- This accounts for a 2 dimensional space.
@@ -215,9 +219,6 @@ kji = i ⊗ k ⊗ j + j ⊗ i ⊗ k + k ⊗ j ⊗ i
 
 
 -- hmmm, where to look now...
-e3 :: T (Tensor (Tensor H H) H)
-e3 = e ⊗ e ⊗ e
-
 -- (id - taut) $ (scale 3 e3) - (scale 1 $ i3 + j3 + k3) == 0
 -- + 3e ⊗ e ⊗ e
 -- - e ⊗ i ⊗ i - i ⊗ e ⊗ i - i ⊗ i ⊗ e
