@@ -227,5 +227,47 @@ e3 = e ⊗ e ⊗ e
 -- One more dimesion down, one to go.
 
 
+--  scale ( 0.000000000) e ⊗ e ⊗ e +
+--
+--  scale (-0.152732081) e ⊗ i ⊗ i +
+--  scale ( 0.045751482) i ⊗ e ⊗ i +
+--  scale ( 0.106980599) i ⊗ i ⊗ e +
+--
+--  scale ( 0.305455256) e ⊗ j ⊗ j +
+--  scale ( 0.002533813) j ⊗ e ⊗ j +
+--  scale (-0.307989068) j ⊗ j ⊗ e +
+--
+--  scale ( 0.259651019) e ⊗ k ⊗ k +
+--  scale (-0.048285295) k ⊗ e ⊗ k +
+--  scale (-0.211365724) k ⊗ k ⊗ e +
+--
+--  scale ( 0.366631618) i ⊗ j ⊗ k +
+--  scale ( 0.094089531) k ⊗ i ⊗ j +
+--  scale (-0.460721150) j ⊗ k ⊗ i +
+--
+--  scale (-0.412435855) i ⊗ k ⊗ j +
+--  scale ( 0.048338049) j ⊗ i ⊗ k +
+--  scale ( 0.364097805) k ⊗ j ⊗ i +
+--
 
+ia = scale (-1) e ⊗ i ⊗ i + scale ( 0.5) i ⊗ e ⊗ i + scale ( 0.5) i ⊗ i ⊗ e
+ib = scale (-1) i ⊗ i ⊗ e + scale ( 0.5) i ⊗ e ⊗ i + scale ( 0.5) e ⊗ i ⊗ i
+ja = scale (-1) e ⊗ j ⊗ j + scale ( 0.5) j ⊗ e ⊗ j + scale ( 0.5) j ⊗ j ⊗ e
+jb = scale (-1) j ⊗ j ⊗ e + scale ( 0.5) j ⊗ e ⊗ j + scale ( 0.5) e ⊗ j ⊗ j
+ka = scale (-1) e ⊗ k ⊗ k + scale ( 0.5) k ⊗ e ⊗ k + scale ( 0.5) k ⊗ k ⊗ e
+kb = scale (-1) k ⊗ k ⊗ e + scale ( 0.5) k ⊗ e ⊗ k + scale ( 0.5) e ⊗ k ⊗ k
+ij = scale (-1) i ⊗ j ⊗ k + scale ( 0.5) k ⊗ i ⊗ j + scale ( 0.5) j ⊗ k ⊗ i
+jk = scale (-1) j ⊗ k ⊗ i + scale ( 0.5) i ⊗ j ⊗ k + scale ( 0.5) k ⊗ i ⊗ j
+kj = scale (-1) k ⊗ j ⊗ i + scale ( 0.5) i ⊗ k ⊗ j + scale ( 0.5) j ⊗ i ⊗ k
+ik = scale (-1) i ⊗ k ⊗ j + scale ( 0.5) j ⊗ i ⊗ k + scale ( 0.5) k ⊗ j ⊗ i
 
+-- taut (scale 2 ia)  =         jb        + kb         - jk         + kj
+-- taut (scale 2 ib)  =         ja        + ka         - ij         + ik
+-- taut (scale 2 ja)  =   ib              + kb         + (ij + jk)  + ik
+-- taut (scale 2 jb)  =   ia              + ka         - jk         - (ik + kj)
+-- taut (scale 2 ka)  =   ib  + jb                     - ij         - (ik + kj)
+-- taut (scale 2 kb)  =   ia  + ja                     + (ij + jk)  + kj
+-- taut (scale 2 ij)  = - ib  + (ja + jb) - ka                      - kj
+-- taut (scale 2 jk)  = - ia  - jb        + (ka + kb)               - ik
+-- taut (scale 2 kj)  =   ia  - (ja + jb) + kb         - ij
+-- taut (scale 2 ik)  =   ib  + ja        - (ka + kb)  - jk
