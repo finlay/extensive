@@ -293,7 +293,58 @@ dotests
    in  mapM_ test combinations
 
 
--- + e ⊗ i ⊗ i - 1/2e ⊗ j ⊗ j + e ⊗ k ⊗ k - 1/2i ⊗ e ⊗ i - 1/2i ⊗ i ⊗ e + 1/2i ⊗ j ⊗ k + i ⊗ k ⊗ j + j ⊗ e ⊗ j - 1/2j ⊗ i ⊗ k - 1/2j ⊗ j ⊗ e + 1/2j ⊗ k ⊗ i - 1/2k ⊗ e ⊗ k - k ⊗ i ⊗ j - 1/2k ⊗ j ⊗ i - 1/2k ⊗ k ⊗ e
+--  +     e ⊗ i ⊗ i
+--  - 1/2 i ⊗ e ⊗ i
+--  - 1/2 i ⊗ i ⊗ e
+--  - 1/2 e ⊗ j ⊗ j
+--  +     j ⊗ e ⊗ j
+--  - 1/2 j ⊗ j ⊗ e
+--  +     e ⊗ k ⊗ k
+--  - 1/2 k ⊗ e ⊗ k
+--  - 1/2 k ⊗ k ⊗ e
+--  + 1/2 i ⊗ j ⊗ k
+--  -     k ⊗ i ⊗ j
+--  + 1/2 j ⊗ k ⊗ i
+--  +     i ⊗ k ⊗ j
+--  - 1/2 j ⊗ i ⊗ k
+--  - 1/2 k ⊗ j ⊗ i
 --
--- - 1/2e ⊗ i ⊗ i + e ⊗ j ⊗ j + e ⊗ k ⊗ k + i ⊗ e ⊗ i - 1/2i ⊗ i ⊗ e + 1/2i ⊗ j ⊗ k - 1/2i ⊗ k ⊗ j - 1/2j ⊗ e ⊗ j - 1/2j ⊗ i ⊗ k - 1/2j ⊗ j ⊗ e - j ⊗ k ⊗ i - 1/2k ⊗ e ⊗ k + 1/2k ⊗ i ⊗ j + k ⊗ j ⊗ i - 1/2k ⊗ k ⊗ e
--- + 1/2e ⊗ i ⊗ i + 1/2e ⊗ j ⊗ j + 1/2e ⊗ k ⊗ k + 1/2i ⊗ e ⊗ i - i ⊗ i ⊗ e - 1/2i ⊗ j ⊗ k + 1/2i ⊗ k ⊗ j - j ⊗ e ⊗ j - j ⊗ i ⊗ k + 1/2j ⊗ j ⊗ e + j ⊗ k ⊗ i + 1/2k ⊗ e ⊗ k - 1/2k ⊗ i ⊗ j + 1/2k ⊗ j ⊗ i - k ⊗ k ⊗ e
+-- (taut + id) $ ia - (ja + jb) + ka + (ij + jk) + ik == 0
+--
+--
+--  - 1/2 e ⊗ i ⊗ i
+--  +     i ⊗ e ⊗ i
+--  - 1/2 i ⊗ i ⊗ e
+--  +     e ⊗ j ⊗ j
+--  - 1/2 j ⊗ e ⊗ j
+--  - 1/2 j ⊗ j ⊗ e
+--  +     e ⊗ k ⊗ k
+--  - 1/2 k ⊗ e ⊗ k
+--  - 1/2 k ⊗ k ⊗ e
+--  + 1/2 i ⊗ j ⊗ k
+--  + 1/2 k ⊗ i ⊗ j
+--  -     j ⊗ k ⊗ i
+--  - 1/2 i ⊗ k ⊗ j
+--  - 1/2 j ⊗ i ⊗ k
+--  +     k ⊗ j ⊗ i
+--
+-- (taut + id) $ (ia + ib) - ja - ka + jk - kj == 0
+--
+--
+--  + 1/2 e ⊗ i ⊗ i
+--  + 1/2 i ⊗ e ⊗ i
+--  -     i ⊗ i ⊗ e
+--  + 1/2 e ⊗ j ⊗ j
+--  -     j ⊗ e ⊗ j
+--  + 1/2 j ⊗ j ⊗ e
+--  + 1/2 e ⊗ k ⊗ k
+--  + 1/2 k ⊗ e ⊗ k
+--  -     k ⊗ k ⊗ e
+--  - 1/2 i ⊗ j ⊗ k
+--  - 1/2 k ⊗ i ⊗ j
+--  +     j ⊗ k ⊗ i
+--  + 1/2 i ⊗ k ⊗ j
+--  -     j ⊗ i ⊗ k
+--  + 1/2 k ⊗ j ⊗ i
+--
+-- (taut + id) $ ib - (ja + jb) + kb - jk - (ik + kj) == 0
