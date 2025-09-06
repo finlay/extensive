@@ -249,7 +249,7 @@ e3 = e ⊗ e ⊗ e
 --  scale ( 0.048338049) j ⊗ i ⊗ k +
 --  scale ( 0.364097805) k ⊗ j ⊗ i +
 --
-
+ia, ib, ja, jb, ka, kb, ij, jk, kj, ik :: T (Tensor (Tensor H H) H)
 ia = scale (-1) e ⊗ i ⊗ i + scale ( 0.5) i ⊗ e ⊗ i + scale ( 0.5) i ⊗ i ⊗ e
 ib = scale (-1) i ⊗ i ⊗ e + scale ( 0.5) i ⊗ e ⊗ i + scale ( 0.5) e ⊗ i ⊗ i
 ja = scale (-1) e ⊗ j ⊗ j + scale ( 0.5) j ⊗ e ⊗ j + scale ( 0.5) j ⊗ j ⊗ e
@@ -271,3 +271,29 @@ ik = scale (-1) i ⊗ k ⊗ j + scale ( 0.5) j ⊗ i ⊗ k + scale ( 0.5) k ⊗ 
 -- taut (scale 2 jk)  = - ia  - jb        + (ka + kb)               - ik
 -- taut (scale 2 kj)  =   ia  - (ja + jb) + kb         - ij
 -- taut (scale 2 ik)  =   ib  + ja        - (ka + kb)  - jk
+
+
+-- for each of five clocks, there are three settings. We want to test all of them
+
+test :: T (Tensor (Tensor H H) H) -> IO ()
+test a
+ = let d = taut a + a
+   in  putStrLn $ "(taut + id)" ++ show a  ++ " -> " ++ show d
+
+dotests :: IO ()
+dotests
+ = let combinations =
+          [ a + b + c + d + e
+          | a <- [ia, ib, ia+ib, scale (-1) ia, scale (-1) ib, scale (-1) (ia + ib)]
+          , b <- [ja, jb, ja+jb, scale (-1) ja, scale (-1) jb, scale (-1) (ja + jb)]
+          , c <- [ka, kb, ka+kb, scale (-1) ka, scale (-1) kb, scale (-1) (ka + kb)]
+          , d <- [ij, jk, ij+jk, scale (-1) ij, scale (-1) jk, scale (-1) (ij + jk)]
+          , e <- [kj, ik, kj+ik, scale (-1) kj, scale (-1) ik, scale (-1) (kj + ik)]
+          ]
+   in  mapM_ test combinations
+
+
+-- + e ⊗ i ⊗ i - 1/2e ⊗ j ⊗ j + e ⊗ k ⊗ k - 1/2i ⊗ e ⊗ i - 1/2i ⊗ i ⊗ e + 1/2i ⊗ j ⊗ k + i ⊗ k ⊗ j + j ⊗ e ⊗ j - 1/2j ⊗ i ⊗ k - 1/2j ⊗ j ⊗ e + 1/2j ⊗ k ⊗ i - 1/2k ⊗ e ⊗ k - k ⊗ i ⊗ j - 1/2k ⊗ j ⊗ i - 1/2k ⊗ k ⊗ e
+--
+-- - 1/2e ⊗ i ⊗ i + e ⊗ j ⊗ j + e ⊗ k ⊗ k + i ⊗ e ⊗ i - 1/2i ⊗ i ⊗ e + 1/2i ⊗ j ⊗ k - 1/2i ⊗ k ⊗ j - 1/2j ⊗ e ⊗ j - 1/2j ⊗ i ⊗ k - 1/2j ⊗ j ⊗ e - j ⊗ k ⊗ i - 1/2k ⊗ e ⊗ k + 1/2k ⊗ i ⊗ j + k ⊗ j ⊗ i - 1/2k ⊗ k ⊗ e
+-- + 1/2e ⊗ i ⊗ i + 1/2e ⊗ j ⊗ j + 1/2e ⊗ k ⊗ k + 1/2i ⊗ e ⊗ i - i ⊗ i ⊗ e - 1/2i ⊗ j ⊗ k + 1/2i ⊗ k ⊗ j - j ⊗ e ⊗ j - j ⊗ i ⊗ k + 1/2j ⊗ j ⊗ e + j ⊗ k ⊗ i + 1/2k ⊗ e ⊗ k - 1/2k ⊗ i ⊗ j + 1/2k ⊗ j ⊗ i - k ⊗ k ⊗ e
