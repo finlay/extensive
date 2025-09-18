@@ -3,6 +3,9 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE Strict #-}
@@ -10,6 +13,8 @@ module Numeric.Extensive.Core where
 
 import Control.Monad
 import Control.Applicative ((<|>))
+import GHC.Generics (Generic)
+import Control.DeepSeq (force, NFData)
 import GHC.TypeLits
 import Data.Proxy
 
@@ -21,8 +26,11 @@ import Prelude hiding ((+), (-), (*), (^), (/), negate, (>), (<), sum, fromInteg
 import qualified Prelude
 
 newtype R = R Double
-    deriving (Num, Ord, Fractional,
+    deriving newtype (Num, Ord, Fractional,
               RealFrac, PrintfArg, Real, Floating)
+    deriving stock (Generic)
+    deriving anyclass (NFData)
+
 epsilon :: R
 epsilon = R 1e-6 -- fast and approximate
 
@@ -121,7 +129,10 @@ extend = flip (>>=)
 
 
 -- Tensor products are just pairs
-data Tensor a b = Tensor a b deriving (Eq, Ord)
+data Tensor a b = Tensor a b
+    deriving (Eq, Ord)
+    deriving stock (Generic)
+    deriving anyclass (NFData)
 tensor :: T a -> T b -> T (Tensor a b)
 tensor tx ty =  (join . (fmap t') . t'') (Tensor tx ty)
     where
@@ -202,6 +213,12 @@ instance Show (N n) where
 -- If we have a vector over a finite set, we can calculate the coefficients
 coefficients :: (FiniteSet x, Eq x) => T x -> [(x, R)]
 coefficients (T v) = map (\e -> (e, v (delta e))) elements
+
+-- Rely on linear first part of continuation
+flatten :: (FiniteSet x, Eq x, NFData x) => T x -> T x
+flatten (T v) =
+  let coef = force $ coefficients (T v)
+  in  dual ((maybe 0.0 id) . (flip lookup coef))
 
 
 -- Normalise vector to have length one

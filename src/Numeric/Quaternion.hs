@@ -1,8 +1,12 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 {-# OPTIONS_GHC -fno-warn-incomplete-uni-patterns #-}
 module Numeric.Quaternion where
+
+import GHC.Generics (Generic)
+import Control.DeepSeq (NFData)
 
 import Numeric.Algebra hiding (zero)
 import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
@@ -10,7 +14,7 @@ import Prelude hiding ((+), (-), (*), (^), negate, (>), (<), sum, fromInteger)
 import Numeric.Extensive
 
 
-data H = E | I | J | K deriving (Eq, Ord)
+data H = E | I | J | K deriving (Eq, Ord, NFData, Generic)
 instance FiniteSet H where elements = [ E, I, J, K ]
 instance Show H where
     show E = "e" ; show I = "i"
