@@ -40,6 +40,16 @@ executable jacobian-exe
   ghc-options: -Wall -fno-warn-name-shadowing -funfolding-use-threshold=16 -O2 -optc-O3
   default-language:    Haskell2010
 
+executable permutation-exe
+  main-is:             app/permutation.hs
+  build-depends:       base,
+                       QuickCheck,
+                       extensive,
+                       combinat
+
+  ghc-options: -Wall -fno-warn-name-shadowing -funfolding-use-threshold=16 -O2 -optc-O3
+  default-language:    Haskell2010
+
 executable su3-exe
   main-is:             app/su3.hs
   build-depends:       base,
