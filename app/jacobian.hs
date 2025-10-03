@@ -350,7 +350,6 @@ dotests
 -- (taut + id) $ ib - (ja + jb) + kb - jk - (ik + kj) == 0
 --
 --
---
 --  + 1/2 e ⊗ i ⊗ i
 --  -     i ⊗ e ⊗ i
 --  + 1/2 i ⊗ i ⊗ e
@@ -367,8 +366,7 @@ dotests
 --  + 1/2 j ⊗ i ⊗ k
 --  + 1/2 k ⊗ j ⊗ i
 --
---
---
+-- (taut + id ) $ (ia + ib) - jb - kb + ij - ik  == 0
 --
 --
 --  + 1/2 e ⊗ i ⊗ i
@@ -387,6 +385,7 @@ dotests
 --  + 1/2 j ⊗ i ⊗ k
 --  -     k ⊗ j ⊗ i
 --
+--  (taut + id) $ (ia + ib) - ja - ka + jk - kj  == 0
 --
 --  - 1/2 e ⊗ i ⊗ i
 --  - 1/2 i ⊗ e ⊗ i
@@ -404,24 +403,82 @@ dotests
 --  - 1/2 j ⊗ i ⊗ k
 --  +     k ⊗ j ⊗ i
 --
---
+--  (taut + id) $ ib + jb - (ka + kb) + (ij + jk) + kj == 0
 --
 --
 --
 --  +     e ⊗ i ⊗ i
---  +     e ⊗ j ⊗ j
---  - 1/2 e ⊗ k ⊗ k
 --  - 1/2 i ⊗ e ⊗ i
 --  - 1/2 i ⊗ i ⊗ e
---  -     i ⊗ j ⊗ k
---  - 1/2 i ⊗ k ⊗ j
+--  +     e ⊗ j ⊗ j
 --  - 1/2 j ⊗ e ⊗ j
---  +     j ⊗ i ⊗ k
 --  - 1/2 j ⊗ j ⊗ e
---  + 1/2 j ⊗ k ⊗ i
+--  - 1/2 e ⊗ k ⊗ k
 --  +     k ⊗ e ⊗ k
---  + 1/2 k ⊗ i ⊗ j
---  - 1/2 k ⊗ j ⊗ i
 --  - 1/2 k ⊗ k ⊗ e
+--  -     i ⊗ j ⊗ k
+--  + 1/2 k ⊗ i ⊗ j
+--  + 1/2 j ⊗ k ⊗ i
+--  - 1/2 i ⊗ k ⊗ j
+--  +     j ⊗ i ⊗ k
+--  - 1/2 k ⊗ j ⊗ i
 --
+--  (taut + id) $ ia + ja - ij - (ka + kb) - (kj + ik) == 0
+--
+--
+
+
+-- ghci> br2 $ e ⊗ i ⊗ i
+--  - e ⊗ e ↦ e
+--  - e ⊗ i ↦ i
+--  + e ⊗ j ↦ j
+--  + e ⊗ k ↦ k
+--  - i ⊗ e ↦ i
+--  + i ⊗ i ↦ e
+--  + i ⊗ j ↦ k
+--  - i ⊗ k ↦ j
+--  - j ⊗ e ↦ j
+--  + j ⊗ i ↦ k
+--  - j ⊗ j ↦ e
+--  + j ⊗ k ↦ i
+--  - k ⊗ e ↦ k
+--  - k ⊗ i ↦ j
+--  - k ⊗ j ↦ i
+--  - k ⊗ k ↦ e
+--
+-- ghci> br2 $ i ⊗ e ⊗ i
+--  - e ⊗ e ↦ e
+--  - e ⊗ i ↦ i
+--  + e ⊗ j ↦ j
+--  + e ⊗ k ↦ k
+--  - i ⊗ e ↦ i
+--  + i ⊗ i ↦ e
+--  + i ⊗ j ↦ k
+--  - i ⊗ k ↦ j
+--  + j ⊗ e ↦ j
+--  - j ⊗ i ↦ k
+--  + j ⊗ j ↦ e
+--  - j ⊗ k ↦ i
+--  + k ⊗ e ↦ k
+--  + k ⊗ i ↦ j
+--  + k ⊗ j ↦ i
+--  + k ⊗ k ↦ e
+--
+-- ghci> br2 $ e ⊗ e ⊗ i
+--  + e ⊗ e ↦ i
+--  - e ⊗ i ↦ e
+--  - e ⊗ j ↦ k
+--  + e ⊗ k ↦ j
+--  - i ⊗ e ↦ e
+--  - i ⊗ i ↦ i
+--  + i ⊗ j ↦ j
+--  + i ⊗ k ↦ k
+--  - j ⊗ e ↦ k
+--  - j ⊗ i ↦ j
+--  - j ⊗ j ↦ i
+--  - j ⊗ k ↦ e
+--  + k ⊗ e ↦ j
+--  - k ⊗ i ↦ k
+--  + k ⊗ j ↦ e
+--  - k ⊗ k ↦ i
 --
