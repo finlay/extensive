@@ -481,4 +481,75 @@ dotests
 --  - k ⊗ i ↦ k
 --  + k ⊗ j ↦ e
 --  - k ⊗ k ↦ i
---
+
+--- lets look at the preimage.
+hht = basis :: [T (Hom (Tensor H H) H)]
+
+eie, eii, eij, eik :: T (Hom (Tensor H H) H)
+eie = hht !!  4 - hht !! 16   --- + e ⊗ i ↦ e - i ⊗ e ↦ e
+eii = hht !!  5 - hht !! 17   --- + e ⊗ i ↦ i - i ⊗ e ↦ i
+eij = hht !!  6 - hht !! 18   --- + e ⊗ i ↦ j - i ⊗ e ↦ j
+eik = hht !!  7 - hht !! 19   --- + e ⊗ i ↦ k - i ⊗ e ↦ k
+eje, eji, ejj, ejk :: T (Hom (Tensor H H) H)
+eje = hht !!  8 - hht !! 32   --- + e ⊗ j ↦ e - j ⊗ e ↦ e
+eji = hht !!  9 - hht !! 33   --- + e ⊗ j ↦ i - j ⊗ e ↦ i
+ejj = hht !! 10 - hht !! 34   --- + e ⊗ j ↦ j - j ⊗ e ↦ j
+ejk = hht !! 11 - hht !! 35   --- + e ⊗ j ↦ k - j ⊗ e ↦ k
+eke, eki, ekj, ekk :: T (Hom (Tensor H H) H)
+eke = hht !! 12 - hht !! 48   --- + e ⊗ k ↦ e - k ⊗ e ↦ e
+eki = hht !! 13 - hht !! 49   --- + e ⊗ k ↦ i - k ⊗ e ↦ i
+ekj = hht !! 14 - hht !! 50   --- + e ⊗ k ↦ j - k ⊗ e ↦ j
+ekk = hht !! 15 - hht !! 51   --- + e ⊗ k ↦ k - k ⊗ e ↦ k
+
+
+test1 :: [T (Hom (Tensor H H) H)]
+test1 = [ eie, eii, eij, eik, eje, eji, ejj, ejk, eke, eki, ekj, ekk ]
+
+-- ghci> mapM_ (\t -> putStrLn $ show t ++ "  -->  " ++ show (invbr2 $ scale 8 t)) test1
+--  + e ⊗ i ↦ e - i ⊗ e ↦ e  -->   + e ⊗ j ⊗ k - e ⊗ k ⊗ j - i ⊗ j ⊗ j - i ⊗ k ⊗ k + j ⊗ j ⊗ i - j ⊗ k ⊗ e + k ⊗ j ⊗ e + k ⊗ k ⊗ i
+--  + e ⊗ i ↦ i - i ⊗ e ↦ i  -->   + e ⊗ j ⊗ j + e ⊗ k ⊗ k + i ⊗ j ⊗ k - i ⊗ k ⊗ j - j ⊗ j ⊗ e - j ⊗ k ⊗ i + k ⊗ j ⊗ i - k ⊗ k ⊗ e
+--  + e ⊗ i ↦ j - i ⊗ e ↦ j  -->   - e ⊗ j ⊗ i + e ⊗ k ⊗ e + i ⊗ j ⊗ e + i ⊗ k ⊗ i + j ⊗ j ⊗ k - j ⊗ k ⊗ j + k ⊗ j ⊗ j + k ⊗ k ⊗ k
+--  + e ⊗ i ↦ k - i ⊗ e ↦ k  -->   - e ⊗ j ⊗ e - e ⊗ k ⊗ i - i ⊗ j ⊗ i + i ⊗ k ⊗ e - j ⊗ j ⊗ j - j ⊗ k ⊗ k + k ⊗ j ⊗ k - k ⊗ k ⊗ j
+--  + e ⊗ j ↦ e - j ⊗ e ↦ e  -->   - e ⊗ i ⊗ k + e ⊗ k ⊗ i + i ⊗ i ⊗ j + i ⊗ k ⊗ e - j ⊗ i ⊗ i - j ⊗ k ⊗ k - k ⊗ i ⊗ e + k ⊗ k ⊗ j
+--  + e ⊗ j ↦ i - j ⊗ e ↦ i  -->   - e ⊗ i ⊗ j - e ⊗ k ⊗ e - i ⊗ i ⊗ k + i ⊗ k ⊗ i + j ⊗ i ⊗ e - j ⊗ k ⊗ j - k ⊗ i ⊗ i - k ⊗ k ⊗ k
+--  + e ⊗ j ↦ j - j ⊗ e ↦ j  -->   + e ⊗ i ⊗ i + e ⊗ k ⊗ k - i ⊗ i ⊗ e + i ⊗ k ⊗ j - j ⊗ i ⊗ k + j ⊗ k ⊗ i - k ⊗ i ⊗ j - k ⊗ k ⊗ e
+--  + e ⊗ j ↦ k - j ⊗ e ↦ k  -->   + e ⊗ i ⊗ e - e ⊗ k ⊗ j + i ⊗ i ⊗ i + i ⊗ k ⊗ k + j ⊗ i ⊗ j + j ⊗ k ⊗ e - k ⊗ i ⊗ k + k ⊗ k ⊗ i
+--  + e ⊗ k ↦ e - k ⊗ e ↦ e  -->   + e ⊗ i ⊗ j - e ⊗ j ⊗ i + i ⊗ i ⊗ k - i ⊗ j ⊗ e + j ⊗ i ⊗ e + j ⊗ j ⊗ k - k ⊗ i ⊗ i - k ⊗ j ⊗ j
+--  + e ⊗ k ↦ i - k ⊗ e ↦ i  -->   - e ⊗ i ⊗ k + e ⊗ j ⊗ e + i ⊗ i ⊗ j - i ⊗ j ⊗ i + j ⊗ i ⊗ i + j ⊗ j ⊗ j + k ⊗ i ⊗ e + k ⊗ j ⊗ k
+--  + e ⊗ k ↦ j - k ⊗ e ↦ j  -->   - e ⊗ i ⊗ e - e ⊗ j ⊗ k - i ⊗ i ⊗ i - i ⊗ j ⊗ j + j ⊗ i ⊗ j - j ⊗ j ⊗ i - k ⊗ i ⊗ k + k ⊗ j ⊗ e
+--  + e ⊗ k ↦ k - k ⊗ e ↦ k  -->   + e ⊗ i ⊗ i + e ⊗ j ⊗ j - i ⊗ i ⊗ e - i ⊗ j ⊗ k + j ⊗ i ⊗ k - j ⊗ j ⊗ e + k ⊗ i ⊗ j - k ⊗ j ⊗ i
+
+
+ije, iji, ijj, ijk :: T (Hom (Tensor H H) H)
+ije = hht !! 24 - hht !! 36    --- + i ⊗ j ↦ e - j ⊗ i ↦ e
+iji = hht !! 25 - hht !! 37    --- + i ⊗ j ↦ i - j ⊗ i ↦ i
+ijj = hht !! 26 - hht !! 38    --- + i ⊗ j ↦ j - j ⊗ i ↦ j
+ijk = hht !! 27 - hht !! 39    --- + i ⊗ j ↦ k - j ⊗ i ↦ k
+jke, jki, jkj, jkk :: T (Hom (Tensor H H) H)
+jke = hht !! 44 - hht !! 56    --- + j ⊗ k ↦ e - k ⊗ j ↦ e
+jki = hht !! 45 - hht !! 57    --- + j ⊗ k ↦ i - k ⊗ j ↦ i
+jkj = hht !! 46 - hht !! 58    --- + j ⊗ k ↦ j - k ⊗ j ↦ j
+jkk = hht !! 47 - hht !! 59    --- + j ⊗ k ↦ k - k ⊗ j ↦ k
+kie, kii, kij, kik :: T (Hom (Tensor H H) H)
+kie = hht !! 52 - hht !! 28    --- - i ⊗ k ↦ e + k ⊗ i ↦ e
+kii = hht !! 53 - hht !! 29    --- - i ⊗ k ↦ i + k ⊗ i ↦ i
+kij = hht !! 54 - hht !! 30    --- - i ⊗ k ↦ j + k ⊗ i ↦ j
+kik = hht !! 55 - hht !! 31    --- - i ⊗ k ↦ k + k ⊗ i ↦ k
+
+
+test2 :: [T (Hom (Tensor H H) H)]
+test2 = [ ije, iji, ijj, ijk, jke, jki, jkj, jkk, kie, kii, kij, kik ]
+
+-- ghci> mapM_ (\t -> putStrLn $ show t ++ "  -->  " ++ show (invbr2 $ scale 8 t)) test2
+--  + i ⊗ j ↦ e - j ⊗ i ↦ e  -->   - e ⊗ e ⊗ k + e ⊗ k ⊗ e + i ⊗ e ⊗ j - i ⊗ k ⊗ i - j ⊗ e ⊗ i - j ⊗ k ⊗ j - k ⊗ e ⊗ e - k ⊗ k ⊗ k
+--  + i ⊗ j ↦ i - j ⊗ i ↦ i  -->   - e ⊗ e ⊗ j + e ⊗ k ⊗ i - i ⊗ e ⊗ k + i ⊗ k ⊗ e + j ⊗ e ⊗ e + j ⊗ k ⊗ k - k ⊗ e ⊗ i - k ⊗ k ⊗ j
+--  + i ⊗ j ↦ j - j ⊗ i ↦ j  -->   + e ⊗ e ⊗ i + e ⊗ k ⊗ j - i ⊗ e ⊗ e - i ⊗ k ⊗ k - j ⊗ e ⊗ k + j ⊗ k ⊗ e - k ⊗ e ⊗ j + k ⊗ k ⊗ i
+--  + i ⊗ j ↦ k - j ⊗ i ↦ k  -->   + e ⊗ e ⊗ e + e ⊗ k ⊗ k + i ⊗ e ⊗ i + i ⊗ k ⊗ j + j ⊗ e ⊗ j - j ⊗ k ⊗ i - k ⊗ e ⊗ k + k ⊗ k ⊗ e
+--  + j ⊗ k ↦ e - k ⊗ j ↦ e  -->   - e ⊗ e ⊗ i + e ⊗ i ⊗ e - i ⊗ e ⊗ e - i ⊗ i ⊗ i + j ⊗ e ⊗ k - j ⊗ i ⊗ j - k ⊗ e ⊗ j - k ⊗ i ⊗ k
+--  + j ⊗ k ↦ i - k ⊗ j ↦ i  -->   + e ⊗ e ⊗ e + e ⊗ i ⊗ i - i ⊗ e ⊗ i + i ⊗ i ⊗ e + j ⊗ e ⊗ j + j ⊗ i ⊗ k + k ⊗ e ⊗ k - k ⊗ i ⊗ j
+--  + j ⊗ k ↦ j - k ⊗ j ↦ j  -->   - e ⊗ e ⊗ k + e ⊗ i ⊗ j - i ⊗ e ⊗ j - i ⊗ i ⊗ k - j ⊗ e ⊗ i + j ⊗ i ⊗ e + k ⊗ e ⊗ e + k ⊗ i ⊗ i
+--  + j ⊗ k ↦ k - k ⊗ j ↦ k  -->   + e ⊗ e ⊗ j + e ⊗ i ⊗ k - i ⊗ e ⊗ k + i ⊗ i ⊗ j - j ⊗ e ⊗ e - j ⊗ i ⊗ i - k ⊗ e ⊗ i + k ⊗ i ⊗ e
+--  - i ⊗ k ↦ e + k ⊗ i ↦ e  -->   - e ⊗ e ⊗ j + e ⊗ j ⊗ e - i ⊗ e ⊗ k - i ⊗ j ⊗ i - j ⊗ e ⊗ e - j ⊗ j ⊗ j + k ⊗ e ⊗ i - k ⊗ j ⊗ k
+--  - i ⊗ k ↦ i + k ⊗ i ↦ i  -->   + e ⊗ e ⊗ k + e ⊗ j ⊗ i - i ⊗ e ⊗ j + i ⊗ j ⊗ e - j ⊗ e ⊗ i + j ⊗ j ⊗ k - k ⊗ e ⊗ e - k ⊗ j ⊗ j
+--  - i ⊗ k ↦ j + k ⊗ i ↦ j  -->   + e ⊗ e ⊗ e + e ⊗ j ⊗ j + i ⊗ e ⊗ i - i ⊗ j ⊗ k - j ⊗ e ⊗ j + j ⊗ j ⊗ e + k ⊗ e ⊗ k + k ⊗ j ⊗ i
+--  - i ⊗ k ↦ k + k ⊗ i ↦ k  -->   - e ⊗ e ⊗ i + e ⊗ j ⊗ k + i ⊗ e ⊗ e + i ⊗ j ⊗ j - j ⊗ e ⊗ k - j ⊗ j ⊗ i - k ⊗ e ⊗ j + k ⊗ j ⊗ e
