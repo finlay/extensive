@@ -1,2 +1,2 @@
 packages: .
-with-compiler: ghc-9.8.2
+with-compiler: ghc-9.10.3
