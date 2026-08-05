@@ -36,7 +36,10 @@ fromDual = extend fromDual'
     fromDual' (Tensor x E) = hom $ em $ Hom E x
     fromDual' (Tensor x y) = scale (-1) $ hom $ em $ Hom y x
 
-
+conjugate2 :: T (Tensor H H) -> T (Tensor H H)
+conjugate2 = extend conjugate2
+  where
+    conjugate2 (Tensor x y) = tensor (conjugate $ return x) (conjugate $ return y)
 
 showMap :: (Show z, Show w) => (H -> H -> z) -> (z -> w) -> IO ()
 showMap combine transform = do
@@ -68,7 +71,7 @@ showBrTau = do
 
 showBrTauInv :: IO ()
 showBrTauInv = do
-  let transform = injectTauInv  . invbr . fromDual . injectTau
+  let transform = injectTauInv  . scale 2.0 .  invbr . fromDual . injectTau
       showLine xy = show xy ++ "  -->  " ++ show (transform xy)
   mapM_ (putStrLn . showLine) tau
 
@@ -128,26 +131,41 @@ br2 = extend $ hom . br2'
                                        tz = return z
                                    in  extend (br2'' tx ty tz)
 
+br2Dual  :: T (Tensor (Tensor H H) H) -> T (Hom (Tensor H H) H)
+br2Dual l = hom $ apply (br2 l) . conjugate2
+
+br2DualTau  :: T (Tensor (Tensor H H) H) -> T (Hom Tau H)
+br2DualTau l = hom $ apply (br2 l) . (conjugate2 . injectTau )
+
+conjugate3 :: T (Tensor (Tensor H H) H) -> T (Tensor (Tensor H H) H)
+conjugate3 = extend conjugate3'
+  where
+    conjugate3' (Tensor x y) = tensor (conjugate2 $ return x) (conjugate $ return y)
+
+sigma3 :: T (Tensor (Tensor H H) H) -> T (Tensor (Tensor H H) H)
+sigma3 = extend sigma3'
+  where
+    sigma3' (Tensor (Tensor x y) z) = tensor (tensor (return z) (return y)) (return x)
 
 invbr2 :: T (Hom (Tensor H H) H) -> T (Tensor (Tensor H H) H)
 invbr2 = inverse br2
 
-showMap2 :: (Show z, Show w) => (H -> H -> H -> z) -> (z -> w) -> IO ()
+showMap2 :: (Show z, Show w) => ((H, H, H) -> z) -> (z -> w) -> IO ()
 showMap2 combine transform = do
   let showLine (x, y, z) =
-         let xyz = combine x y z
+         let xyz = combine (x, y, z)
          in  show xyz ++ "  -->  " ++ show (transform xyz)
       hs = elements :: [H]
   mapM_ (putStrLn . showLine) [ (x,y,z) | x <- hs, y <- hs, z <- hs]
 
-mk3 :: R -> H -> H -> H -> T (Tensor (Tensor H H) H)
-mk3 r x y z = scale r $ return (Tensor (Tensor x y) z) :: T (Tensor (Tensor H H) H)
+mk3 :: R -> (H, H, H) -> T (Tensor (Tensor H H) H)
+mk3 r (x, y, z) = scale r $ return (Tensor (Tensor x y) z) :: T (Tensor (Tensor H H) H)
 
 showBr2 :: IO ()
 showBr2 = showMap2 (mk3 1.0) br2
 
 showInvBr2 :: IO ()
-showInvBr2 = showMap2 (\x -> \y -> \z -> scale 16 $ return (Hom (Tensor x y) z) :: T (Hom (Tensor H H) H)) invbr2
+showInvBr2 = showMap2 (\(x, y, z) -> scale 16 $ return (Hom (Tensor x y) z) :: T (Hom (Tensor H H) H)) invbr2
 
 
 tau2 :: T (Hom (Tensor H H) H) -> T (Hom (Tensor H H) H)
@@ -520,11 +538,11 @@ test1 = [ eie, eii, eij, eik, eje, eji, ejj, ejk, eke, eki, ekj, ekk ]
 --  + e ⊗ k ↦ k - k ⊗ e ↦ k  -->   + e ⊗ i ⊗ i + e ⊗ j ⊗ j - i ⊗ i ⊗ e - i ⊗ j ⊗ k + j ⊗ i ⊗ k - j ⊗ j ⊗ e + k ⊗ i ⊗ j - k ⊗ j ⊗ i
 
 
-ije, iji, ijj, ijk :: T (Hom (Tensor H H) H)
+ije, iji, ijj, ijk' :: T (Hom (Tensor H H) H)
 ije = hht !! 24 - hht !! 36    --- + i ⊗ j ↦ e - j ⊗ i ↦ e
 iji = hht !! 25 - hht !! 37    --- + i ⊗ j ↦ i - j ⊗ i ↦ i
 ijj = hht !! 26 - hht !! 38    --- + i ⊗ j ↦ j - j ⊗ i ↦ j
-ijk = hht !! 27 - hht !! 39    --- + i ⊗ j ↦ k - j ⊗ i ↦ k
+ijk' = hht !! 27 - hht !! 39    --- + i ⊗ j ↦ k - j ⊗ i ↦ k
 jke, jki, jkj, jkk :: T (Hom (Tensor H H) H)
 jke = hht !! 44 - hht !! 56    --- + j ⊗ k ↦ e - k ⊗ j ↦ e
 jki = hht !! 45 - hht !! 57    --- + j ⊗ k ↦ i - k ⊗ j ↦ i
@@ -538,7 +556,7 @@ kik = hht !! 55 - hht !! 31    --- - i ⊗ k ↦ k + k ⊗ i ↦ k
 
 
 test2 :: [T (Hom (Tensor H H) H)]
-test2 = [ ije, iji, ijj, ijk, jke, jki, jkj, jkk, kie, kii, kij, kik ]
+test2 = [ ije, iji, ijj, ijk', jke, jki, jkj, jkk, kie, kii, kij, kik ]
 
 -- ghci> mapM_ (\t -> putStrLn $ show t ++ "  -->  " ++ show (invbr2 $ scale 8 t)) test2
 --  + i ⊗ j ↦ e - j ⊗ i ↦ e  -->   - e ⊗ e ⊗ k + e ⊗ k ⊗ e + i ⊗ e ⊗ j - i ⊗ k ⊗ i - j ⊗ e ⊗ i - j ⊗ k ⊗ j - k ⊗ e ⊗ e - k ⊗ k ⊗ k
@@ -553,3 +571,7 @@ test2 = [ ije, iji, ijj, ijk, jke, jki, jkj, jkk, kie, kii, kij, kik ]
 --  - i ⊗ k ↦ i + k ⊗ i ↦ i  -->   + e ⊗ e ⊗ k + e ⊗ j ⊗ i - i ⊗ e ⊗ j + i ⊗ j ⊗ e - j ⊗ e ⊗ i + j ⊗ j ⊗ k - k ⊗ e ⊗ e - k ⊗ j ⊗ j
 --  - i ⊗ k ↦ j + k ⊗ i ↦ j  -->   + e ⊗ e ⊗ e + e ⊗ j ⊗ j + i ⊗ e ⊗ i - i ⊗ j ⊗ k - j ⊗ e ⊗ j + j ⊗ j ⊗ e + k ⊗ e ⊗ k + k ⊗ j ⊗ i
 --  - i ⊗ k ↦ k + k ⊗ i ↦ k  -->   - e ⊗ e ⊗ i + e ⊗ j ⊗ k + i ⊗ e ⊗ e + i ⊗ j ⊗ j - j ⊗ e ⊗ k - j ⊗ j ⊗ i - k ⊗ e ⊗ j + k ⊗ j ⊗ e
+
+
+
+
