@@ -64,6 +64,14 @@ comm a b = a * b - b * a
 ehh :: [T (Tensor H H)]
 ehh = map return elements
 
+conjugate :: T H -> T H
+conjugate = extend conjugate'
+  where
+    conjugate' E =         return E
+    conjugate' I = minus $ return I
+    conjugate' J = minus $ return J
+    conjugate' K = minus $ return K
+
 -- Create a new more convenient basis for H Tensor H
 -- Need to give names, and elements
 -- Then, expand arbitary elements in the new basis
